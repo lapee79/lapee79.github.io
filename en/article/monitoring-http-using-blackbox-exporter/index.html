@@ -1,0 +1,788 @@
+<!doctype html>
+<html class="no-js" lang="en">
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="author" content="lapee79">
+        <meta name="description" content="lapee79&#39;s IT Tech Blog.">
+        <meta name="keywords" content="blog,personal,posts,it,korean">
+        <meta name="generator" content="Hugo 0.53" />
+        <title> Monitoring HTTP using Blackbox exporter | lapee79&#39;s Tech Blog</title>
+        <meta name="description" content="Monitoring HTTP using Blackbox exporter - lapee79&#39;s IT Tech Blog.">
+        <meta itemprop="name" content="Monitoring HTTP using Blackbox exporter">
+        <meta itemprop="description" content="Monitoring HTTP using Blackbox exporter - lapee79&#39;s IT Tech Blog.">
+        <meta property="og:title" content="Monitoring HTTP using Blackbox exporter">
+        <meta property="og:description" content="Monitoring HTTP using Blackbox exporter - lapee79&#39;s IT Tech Blog.">
+        <meta property="og:image" content="https://www.gravatar.com/avatar/4068068eb59505ffebdc556d0aa2c9c9?size=200">
+        <meta property="og:url" content="https://lapee79.github.io/en/article/monitoring-http-using-blackbox-exporter/">
+        <meta property="og:site_name" content="lapee79&#39;s Tech Blog">
+        <meta property="og:type" content="article">
+        <link rel="icon" type="image/png" href="https://lapee79.github.io/favicon-32x32.png" sizes="32x32">
+        <link rel="icon" type="image/png" href="https://lapee79.github.io/favicon-16x16.png" sizes="16x16">
+
+	
+
+        
+        
+        
+        
+        <link rel="stylesheet" href="https://lapee79.github.io/sass/combined.min.c7b63af25d73ccc22a82ec5d3a6dfccaf77ecee67014e5cc71dd9d8eafec0d4e.css">
+
+        
+
+        
+            
+        
+    </head>
+    <body class="bilberry-hugo-theme">
+        
+<nav class="permanentTopNav">
+
+    <div class="container">
+        <ul class="topnav">
+            
+        </ul>
+
+        
+            <div id="search-box" class="search">
+                <i class="fa fa-search"></i>
+                <input id="search" type="text" placeholder="Search ...">
+            </div>
+        
+    </div>
+</nav>
+
+
+        <header>
+    <div class="container">
+        <div class="logo">
+            <a href="/en" class="logo">
+                
+                    <img src="https://www.gravatar.com/avatar/4068068eb59505ffebdc556d0aa2c9c9?d=mm&size=200" alt="">
+                
+
+                <span class="overlay"><i class="fa fa-home"></i></span>
+            </a>
+        </div>
+        <div class="titles">
+            <h3 class="title"><a href="/en">lapee79&#39;s Tech Blog</a></h3>
+            
+                <span class="subtitle">lapee79의 기술 지식 창고.</span>
+            
+        </div>
+
+    
+
+        
+        <div class="toggler permanentTopNav">
+        
+            <i class="fa fa-bars" aria-hidden="true"></i>
+        </div>
+    </div>
+    <script data-ad-client="ca-pub-6723773787660575" async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
+</header>
+
+
+        <div class="main container">
+            
+     
+    <div class="article-wrapper u-cf single">
+        
+            <a class="bubble" href="/en/article/monitoring-http-using-blackbox-exporter/">
+    <i class="fa fa-fw fa-pencil"></i>
+</a>
+
+<article class="default article">
+    
+    <div class="featured-image">
+        <a href="/en/article/monitoring-http-using-blackbox-exporter/">
+            
+                <img src="/en/article/monitoring-http-using-blackbox-exporter/featuredImage_hu9241d70c78680547fbdff3926617d197_138845_700x350_fill_q95_box_smart1_2.png" alt="">
+            
+        </a>
+    </div>
+
+
+    <div class="content">
+    <h3><a href="/en/article/monitoring-http-using-blackbox-exporter/">Monitoring HTTP using Blackbox exporter</a></h3>
+    <div class="meta">
+        
+            
+                <span class="date moment">2019-10-27</span>
+            
+        
+
+        
+
+        
+            <span class="categories">
+                
+                    <a href="/en/categories/prometheus">Prometheus</a>
+                
+                    <a href="/en/categories/monitoring">Monitoring</a>
+                
+                    <a href="/en/categories/exporter">Exporter</a>
+                
+                    <a href="/en/categories/tutorials">Tutorials</a>
+                
+            </span>
+        
+
+        
+            <span class="author"><a href="/en/author/lapee79">lapee79</a></span>
+        
+    </div>
+
+    
+        
+
+<p><a href="https://github.com/prometheus/blackbox_exporter">Blackbox exporter</a> can monitor the external services over HTTP, HTTPS, DNS, TCP, ICMP on Prometheus. In this post, I&rsquo;ll show you how to monitor HTTP/HTTPS using Blackbox exporter. Blackbox exporter is going to be running on Kubernetes.</p>
+
+<h2 id="environment">Environment</h2>
+
+<p>Before you begin, you need to have these:</p>
+
+<ul>
+<li>Kubernetes</li>
+<li>Prometheus operator</li>
+</ul>
+
+<h2 id="blackbox-exporter-configuration">Blackbox exporter configuration</h2>
+
+<p>Write the Blackbox configuration file as <code>ConfigMap</code> to configure <code>http</code> module for monitoring web services.</p>
+
+<pre><code>apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: prometheus-blackbox-exporter
+  labels:
+    app: prometheus-blackbox-exporter
+data:
+  blackbox.yaml: |
+    modules:
+      http_2xx:
+        http:
+          no_follow_redirects: false
+          preferred_ip_protocol: ip4
+          valid_http_versions:
+          - HTTP/1.1
+          - HTTP/2
+          valid_status_codes: []
+        prober: http
+        timeout: 5s
+</code></pre>
+
+<p>The <code>http_2xx</code> module is used to check if the web service returns 2xx HTTP status code through the HTTP protocol. Learn more about the Blackbox exporter configuration in <a href="https://github.com/prometheus/blackbox_exporter/blob/master/CONFIGURATION.md">this doc</a>.</p>
+
+<h2 id="deploy-blackbox-exporter-to-kubernetes-cluster">Deploy Blackbox exporter to Kubernetes cluster</h2>
+
+<p>Write the <code>Deployment</code> and <code>Service</code> to be deployed to Kubernetes.</p>
+
+<pre><code>---
+kind: Service
+apiVersion: v1
+metadata:
+  name: prometheus-blackbox-exporter
+  labels:
+    app: prometheus-blackbox-exporter
+spec:
+  type: ClusterIP
+  ports:
+    - name: http
+      port: 9115
+      protocol: TCP
+  selector:
+    app: prometheus-blackbox-exporter
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: prometheus-blackbox-exporter
+  labels:
+    app: prometheus-blackbox-exporter
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: prometheus-blackbox-exporter
+  template:
+    metadata:
+      labels:
+        app: prometheus-blackbox-exporter
+    spec:
+      restartPolicy: Always
+      containers:
+        - name: blackbox-exporter
+          image: &quot;prom/blackbox-exporter:v0.15.1&quot;
+          imagePullPolicy: IfNotPresent
+          securityContext:
+            readOnlyRootFilesystem: true
+            runAsNonRoot: true
+            runAsUser: 1000
+          args:
+            - &quot;--config.file=/config/blackbox.yaml&quot;
+          resources:
+            {}
+          ports:
+            - containerPort: 9115
+              name: http
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: http
+          readinessProbe:
+            httpGet:
+              path: /health
+              port: http
+          volumeMounts:
+            - mountPath: /config
+              name: config
+        - name: configmap-reload
+          image: &quot;jimmidyson/configmap-reload:v0.2.2&quot;
+          imagePullPolicy: &quot;IfNotPresent&quot;
+          securityContext:
+            runAsNonRoot: true
+            runAsUser: 65534
+          args:
+            - --volume-dir=/etc/config
+            - --webhook-url=http://localhost:9115/-/reload
+          resources:
+            {}
+          volumeMounts:
+            - mountPath: /etc/config
+              name: config
+              readOnly: true
+      volumes:
+        - name: config
+          configMap:
+            name: prometheus-blackbox-exporter
+</code></pre>
+
+<p>Blackbox exporter can be deployed by the following command. <code>monitoring</code> namespace is specified for Prometheus operator.</p>
+
+<pre><code class="language-shell">kubectl --namespace=monitoring apply -f blackbox-exporter.yaml
+</code></pre>
+
+<p>Verify that all service is running using the following command:</p>
+
+<pre><code class="language-shell">kubectl --namespace=monitoring get all --selector=app=prometheus-blackbox-exporter
+</code></pre>
+
+<h2 id="test-blackbox-exporter">Test Blackbox exporter</h2>
+
+<p>You can access Blackbox exporter Web UI using <code>port-forward</code> :</p>
+
+<pre><code class="language-shell">kubectl --namespace=monitoring port-forward svc/prometheus-blackbox-exporter 9115:9115
+</code></pre>
+
+<p>Connect to Blackbox exporter Web UI via  <a href="http://localhost:9115">http://localhost:9115</a> using web browser.</p>
+
+<p><img src="./bb-exporter-web-browser.png" alt="Blackbox Exporter Web UI" /></p>
+
+<p>If you visit <a href="http://localhost:9115/probe?module=http_2xx&amp;target=https://www.google.com">http://localhost:9115/probe?module=http_2xx&amp;target=https://www.google.com</a> you will see the result of target URL(<a href="https://www.google.com">https://www.google.com</a>).</p>
+
+<p><img src="./web-test-url-metrics.png" alt="URL Test on web browser" /></p>
+
+<p>For example, if the value of <code>probe_success</code> metrics is  <code>1</code> , it means success. But <code>0</code> means failure.</p>
+
+<h2 id="add-prometheus-config">Add Prometheus config</h2>
+
+<p>After deploying BlackBox exporter, write Prometheus scrape configuration in <code>prometheus-additional.yaml</code>.</p>
+
+<pre><code>- job_name: 'kube-api-blackbox'
+  scrape_interval: 1w
+  metrics_path: /probe
+  params:
+    module: [http_2xx]
+  static_configs:
+   - targets:
+      - https://www.google.com
+      - http://www.example.com
+      - https://prometheus.io
+  relabel_configs:
+   - source_labels: [__address__]
+     target_label: __param_target
+   - source_labels: [__param_target]
+     target_label: instance
+   - target_label: __address__
+     replacement: prometheus-blackbox-exporter:9115 # The blackbox exporter.
+</code></pre>
+
+<p>Generate <code>Secret</code> using the following command.</p>
+
+<pre><code class="language-shell">PROMETHEUS_ADD_CONFIG=$(cat prometheus-additional.yaml | base64)
+cat &lt;&lt; EOF | kubectl --namespace=monitoring apply -f -
+apiVersion: v1
+kind: Secret
+metadata:
+  name: additional-scrape-configs
+type: Opaque
+data:
+  prometheus-additional.yaml: $PROMETHEUS_ADD_CONFIG
+EOF
+</code></pre>
+
+<p>Specify <code>additional-scrape-configs</code> to Prometheus operator using <code>additionalScrapeConfigs</code> .</p>
+
+<pre><code class="language-shell">kubectl --namespace=monitoring edit prometheuses k8s
+...
+spec:
+  additionalScrapeConfigs:
+    key: prometheus-additional.yaml
+    name: additional-scrape-configs
+</code></pre>
+
+<p>Access Prometheus Web UI and verify metrics and targets.</p>
+
+<pre><code class="language-shell">kubectl --namespace=monitoring port-forward svc/prometheus-k8s 9090:9090
+</code></pre>
+
+<p><img src="./prometheus-metrics.png" alt="Prometheus Metrics" /></p>
+
+<p><img src="./prometheus-targets.png" alt="Prometheus Targets" /></p>
+
+<p>You&rsquo;ll find Blackbox&rsquo;s metrics and targets.</p>
+
+<h2 id="add-alert-rule">Add Alert rule</h2>
+
+<p>To receive alerts about Blackbox exporter, add alert rules to Prometheus operator.</p>
+
+<pre><code class="language-shell">kubectl --namespace=monitoring edit prometheusrules prometheus-k8s-rules
+...
+  - name: blackbox-exporter
+    rules:
+    - alert: ProbeFailed
+      expr: probe_success == 0
+      for: 5m
+      labels:
+        severity: error
+      annotations:
+        summary: &quot;Probe failed (instance {{ $labels.instance }})&quot;
+        description: &quot;Probe failed\n  VALUE = {{ $value }}\n  LABELS: {{ $labels }}&quot;
+    - alert: SlowProbe
+      expr: avg_over_time(probe_duration_seconds[1m]) &gt; 1
+      for: 5m
+      labels:
+        severity: warning
+      annotations:
+        summary: &quot;Slow probe (instance {{ $labels.instance }})&quot;
+        description: &quot;Blackbox probe took more than 1s to complete\n  VALUE = {{ $value }}\n  LABELS: {{ $labels }}&quot;
+    - alert: HttpStatusCode
+      expr: probe_http_status_code &lt;= 199 OR probe_http_status_code &gt;= 400
+      for: 5m
+      labels:
+        severity: error
+      annotations:
+        summary: &quot;HTTP Status Code (instance {{ $labels.instance }})&quot;
+        description: &quot;HTTP status code is not 200-399\n  VALUE = {{ $value }}\n  LABELS: {{ $labels }}&quot;
+    - alert: SslCertificateWillExpireSoon
+      expr: probe_ssl_earliest_cert_expiry - time() &lt; 86400 * 30
+      for: 5m
+      labels:
+        severity: warning
+      annotations:
+        summary: &quot;SSL certificate will expire soon (instance {{ $labels.instance }})&quot;
+        description: &quot;SSL certificate expires in 30 days\n  VALUE = {{ $value }}\n  LABELS: {{ $labels }}&quot;
+    - alert: SslCertificateHasExpired
+      expr: probe_ssl_earliest_cert_expiry - time()  &lt;= 0
+      for: 5m
+      labels:
+        severity: error
+      annotations:
+        summary: &quot;SSL certificate has expired (instance {{ $labels.instance }})&quot;
+        description: &quot;SSL certificate has expired already\n  VALUE = {{ $value }}\n  LABELS: {{ $labels }}&quot;
+    - alert: HttpSlowRequests
+      expr: avg_over_time(probe_http_duration_seconds[1m]) &gt; 1
+      for: 5m
+      labels:
+        severity: warning
+      annotations:
+        summary: &quot;HTTP slow requests (instance {{ $labels.instance }})&quot;
+        description: &quot;HTTP request took more than 1s\n  VALUE = {{ $value }}\n  LABELS: {{ $labels }}&quot;
+    - alert: SlowPing
+      expr: avg_over_time(probe_icmp_duration_seconds[1m]) &gt; 1
+      for: 5m
+      labels:
+        severity: warning
+      annotations:
+        summary: &quot;Slow ping (instance {{ $labels.instance }})&quot;
+        description: &quot;Blackbox ping took more than 1s\n  VALUE = {{ $value }}\n  LABELS: {{ $labels }}&quot;
+</code></pre>
+
+<p>Navigate to <code>Status =&gt; Rules</code> on Prometheus Web UI and find <code>blackbox-exporter</code> alert rules.</p>
+
+<p><img src="./prometheus-alert-rules.png" alt="Prometheus Alert rules" /></p>
+
+<h2 id="get-alerted-before-kubernetes-api-server-ssl-certificates-expire">Get alerted before Kubernetes API Server SSL certificates expire</h2>
+
+<p>Let&rsquo;s setup the monitoring for Kubernetes API Server SSL certificates expire. It&rsquo;ll send alerts once a week.</p>
+
+<h3 id="add-blackbox-exporter-module-for-kubernetes-api-server-authentication">Add Blackbox exporter module for Kubernetes API Server Authentication</h3>
+
+<pre><code class="language-shell">kubectl --namespace=monitoring edit configmap prometheus-blackbox-exporter
+...
+      kube-api:
+        http:
+          method: GET
+          no_follow_redirects: false
+          preferred_ip_protocol: ip4
+          tls_config:
+            insecure_skip_verify: false
+            ca_file: /var/run/secrets/kubernetes.io/serviceaccount/ca.crt
+          bearer_token_file: /var/run/secrets/kubernetes.io/serviceaccount/token
+          valid_http_versions:
+          - HTTP/1.1
+          - HTTP/2
+          valid_status_codes: []
+        prober: http
+        timeout: 5s
+</code></pre>
+
+<h3 id="add-prometheus-scrape-configuration">Add Prometheus scrape configuration</h3>
+
+<pre><code>- job_name: 'kube-api-blackbox'
+  metrics_path: /probe
+  params:
+    module: [kube-api]
+  static_configs:
+   - targets:
+      - https://kubernetes.default.svc/api
+  relabel_configs:
+   - source_labels: [__address__]
+     target_label: __param_target
+   - source_labels: [__param_target]
+     target_label: instance
+   - target_label: __address__
+     replacement: prometheus-blackbox-exporter:9115 # The blackbox exporter.
+</code></pre>
+
+<h3 id="apply-prometheus-secret">Apply Prometheus Secret</h3>
+
+<pre><code class="language-shell">PROMETHEUS_ADD_CONFIG=$(cat prometheus-additional.yaml | base64)
+cat &lt;&lt; EOF | kubectl --namespace=monitoring apply -f -
+apiVersion: v1
+kind: Secret
+metadata:
+  name: additional-scrape-configs
+type: Opaque
+data:
+  prometheus-additional.yaml: $PROMETHEUS_ADD_CONFIG
+EOF
+</code></pre>
+
+<h3 id="add-alert-rule-1">Add Alert rule</h3>
+
+<pre><code class="language-shell">kubectl --namespace=monitoring edit prometheusrules prometheus-k8s-rules
+...
+  - name: k8s-api-server-cert-expiry
+    rules:
+    - alert: K8sAPIServerSSLCertExpiringAfterThreeMonths
+      expr: probe_ssl_earliest_cert_expiry{job=&quot;kube-api-blackbox&quot;} - time() &lt; 86400 * 90 
+      for: 1w
+      labels:
+        severity: warning
+      annotations:
+        summary: &quot;Kubernetes API Server SSL certificate will expire after three months (instance {{ $labels.instance }})&quot;
+        description: &quot;Kubernetes API Server SSL certificate expires in 90 days\n  VALUE = {{ $value }}\n  LABELS: {{ $labels }}&quot;
+</code></pre>
+
+<h2 id="related-links">Related links</h2>
+
+<ul>
+<li><a href="https://github.com/prometheus/blackbox_exporter">https://github.com/prometheus/blackbox_exporter</a></li>
+<li><a href="https://awesome-prometheus-alerts.grep.to/rules#blackbox">https://awesome-prometheus-alerts.grep.to/rules#blackbox</a></li>
+</ul>
+
+    
+</div>
+
+    
+<div class="footer">
+
+
+    
+        <div class="tags">
+            <i class="fa fa-tags"></i>
+            <div class="links">
+                
+                    <a href="/en/tags/prometheus">Prometheus</a>
+                
+                    <a href="/en/tags/blackbox">Blackbox</a>
+                
+                    <a href="/en/tags/exporter">exporter</a>
+                
+                    <a href="/en/tags/tutorials">Tutorials</a>
+                
+                    <a href="/en/tags/monitoring">monitoring</a>
+                
+            </div>
+        </div>
+    
+
+    
+    <div class="languages">
+        <i class="fa fa-language"></i>
+        <div class="links">
+            
+                <a href="https://lapee79.github.io/article/monitoring-http-using-blackbox-exporter/">ko</a>
+            
+        </div>
+    </div>
+    
+</div>
+
+</article>
+
+        
+    </div>
+
+    
+        <div id="disqus_thread"></div>
+<script type="application/javascript">
+    var disqus_config = function () {
+    
+    
+    
+    };
+    (function() {
+        if (["localhost", "127.0.0.1"].indexOf(window.location.hostname) != -1) {
+            document.getElementById('disqus_thread').innerHTML = 'Disqus comments not available by default when the website is previewed locally.';
+            return;
+        }
+        var d = document, s = d.createElement('script'); s.async = true;
+        s.src = '//' + "lapee79s-tech-blog" + '.disqus.com/embed.js';
+        s.setAttribute('data-timestamp', +new Date());
+        (d.head || d.body).appendChild(s);
+    })();
+</script>
+<noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+<a href="https://disqus.com" class="dsq-brlink">comments powered by <span class="logo-disqus">Disqus</span></a>
+    
+
+     
+
+        </div>
+
+        
+<footer>
+    <div class="container">
+
+        
+        <div class="recent-posts">
+            <strong>Latest posts</strong>
+                <ul>
+                
+                    <li>
+                        <a href="/en/article/use-a-local-disk-by-local-volume-static-provisioner-in-kubernetes/">Use a local disk through Local Persistent Volumes in Kubernetes</a>
+                    </li>
+                
+                    <li>
+                        <a href="/en/article/setup-production-ready-kubernetes-on-baremetal-with-kubespray/">Setup Production Ready Kubernetes on baremetal with kubespray</a>
+                    </li>
+                
+                    <li>
+                        <a href="/en/article/monitoring-http-using-blackbox-exporter/">Monitoring HTTP using Blackbox exporter</a>
+                    </li>
+                
+                    <li>
+                        <a href="/en/article/loki-kubernetes-logging/">Loki - Kubernetes logging</a>
+                    </li>
+                
+                    <li>
+                        <a href="/en/article/setup-a-production-ready-istio/">Setup a production-ready Istio</a>
+                    </li>
+                
+                    <li>
+                        <a href="/en/article/prometheus-alertmanager-with-msteams/">Alerts of the Prometheus Alertmanager with MS Teams</a>
+                    </li>
+                
+                </ul>
+        </div>
+        
+
+        
+        <div class="categories">
+            <a href="/en/categories/"><strong>Categories</strong></a>
+                <ul>
+                
+                    <li>
+                        <a href="/en/categories/kubernetes">Kubernetes (3)</a>
+                    </li>
+                
+                    <li>
+                        <a href="/en/categories/tutorials">Tutorials (3)</a>
+                    </li>
+                
+                    <li>
+                        <a href="/en/categories/devops">Devops (2)</a>
+                    </li>
+                
+                    <li>
+                        <a href="/en/categories/monitoring">Monitoring (2)</a>
+                    </li>
+                
+                    <li>
+                        <a href="/en/categories/prometheus">Prometheus (2)</a>
+                    </li>
+                
+                    <li>
+                        <a href="/en/categories/alertmanager">Alertmanager (1)</a>
+                    </li>
+                
+                    <li>
+                        <a href="/en/categories/exporter">Exporter (1)</a>
+                    </li>
+                
+                    <li>
+                        <a href="/en/categories/grafana">Grafana (1)</a>
+                    </li>
+                
+                    <li>
+                        <a href="/en/categories/istio">Istio (1)</a>
+                    </li>
+                
+                    <li>
+                        <a href="/en/categories/loki">Loki (1)</a>
+                    </li>
+                
+                    <li>
+                        <a href="/en/categories/service-mesh">Service mesh (1)</a>
+                    </li>
+                
+            </ul>
+        </div>
+        
+
+        <div class="right">
+            
+            <div class="external-profiles">
+                <strong>Social media</strong>
+
+                
+                
+                
+                
+                
+                
+                
+                
+                
+                
+                    <a href="https://github.com/lapee79" target="_blank"><i class="fa fa-github"></i></a>
+                
+                
+            </div>
+            
+
+            
+        </div>
+    </div>
+</footer>
+
+
+<div class="credits">
+    <div class="container">
+        <div class="copyright">
+            <a href="https://github.com/lapee79" target="_blank">
+                &copy;
+                
+                    2020
+                
+                by lapee79
+            </a>
+	    
+        </div>
+        <div class="author">
+            <a href="https://github.com/Lednerb/bilberry-hugo-theme" target="_blank">Bilberry Hugo Theme</a>
+        </div>
+    </div>
+</div>
+
+
+        
+<script type="application/javascript">
+var doNotTrack = false;
+if (!doNotTrack) {
+	window.ga=window.ga||function(){(ga.q=ga.q||[]).push(arguments)};ga.l=+new Date;
+	ga('create', 'UA-148360124-1', 'auto');
+	
+	ga('send', 'pageview');
+}
+</script>
+<script async src='https://www.google-analytics.com/analytics.js'></script>
+
+
+        
+
+        
+        
+        <script type="text/javascript" src="https://lapee79.github.io/js/externalDependencies.39c47e10e241eae2947b3fe21809c572.js" integrity="md5-OcR&#43;EOJB6uKUez/iGAnFcg=="></script>
+
+        
+        
+        <script type="text/javascript" src="https://lapee79.github.io/js/theme.ff50ae6dc1bfc220b23bf69dbb41b54e.js" integrity="md5-/1CubcG/wiCyO/adu0G1Tg=="></script>
+
+        <script>
+            $(".moment").each(function() {
+                $(this).text(
+                    moment( $(this).text() )
+                        .locale( "en" )
+                        .format('LL')
+                );
+            });
+
+            $(".footnote-return sup").html("");
+        </script>
+
+        
+            
+        
+
+        
+            <script>
+    var client = algoliasearch("1RS3EVEBZI", "287247fefbadb3e2e5e0960034440842");
+    var index = client.initIndex("lapee79-tech-blog");
+
+    $('#search').autocomplete({ hint: false, autoselect: true, debug: false },
+      [
+        {
+          
+            source: $.fn.autocomplete.sources.hits(index, { hitsPerPage: 10 }),
+          
+          displayKey: function(suggestion) {
+            return suggestion.title || suggestion.author
+          },
+          templates: {
+            suggestion: function(suggestion) {
+                return "<span class='entry " + suggestion.type + "'>"
+                      + "<span class='title'>" + suggestion.title + "</span>"
+                      + "<span class='fa fa-fw " + suggestion.iconClass + "'></span>"
+                  + "</span>"
+                ;
+            },
+            empty: function() {
+              return "<span class='empty'>Nothing found.</span>"
+            },
+            footer: function() {
+              return '<div class="branding">Powered by <img src="https:\/\/lapee79.github.io\/dist\/algolia-logo-light.svg" /></div>'
+            }
+
+          },
+        }
+      ])
+      .on('autocomplete:selected', function(event, suggestion, dataset) {
+        window.location = (suggestion.url);
+      })
+      .keypress(function (event, suggestion) {
+        if (event.which == 13) {
+          window.location = (suggestion.url);
+        }
+      });
+</script>
+
+        
+
+
+    </body>
+</html>

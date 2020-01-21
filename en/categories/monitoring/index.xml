@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Monitoring on lapee79&#39;s Tech Blog</title>
+    <link>https://lapee79.github.io/en/categories/monitoring/</link>
+    <description>Recent content in Monitoring on lapee79&#39;s Tech Blog</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <lastBuildDate>Sun, 27 Oct 2019 10:00:00 +0000</lastBuildDate>
+    
+	<atom:link href="https://lapee79.github.io/en/categories/monitoring/index.xml" rel="self" type="application/rss+xml" />
+    
+    
+    <item>
+      <title>Monitoring HTTP using Blackbox exporter</title>
+      <link>https://lapee79.github.io/en/article/monitoring-http-using-blackbox-exporter/</link>
+      <pubDate>Sun, 27 Oct 2019 10:00:00 +0000</pubDate>
+      
+      <guid>https://lapee79.github.io/en/article/monitoring-http-using-blackbox-exporter/</guid>
+      <description>Blackbox exporter can monitor the external services over HTTP, HTTPS, DNS, TCP, ICMP on Prometheus. In this post, I&amp;rsquo;ll show you how to monitor HTTP/HTTPS using Blackbox exporter. Blackbox exporter is going to be running on Kubernetes.
+Environment Before you begin, you need to have these:
+ Kubernetes Prometheus operator  Blackbox exporter configuration Write the Blackbox configuration file as ConfigMap to configure http module for monitoring web services.</description>
+    </item>
+    
+    <item>
+      <title>Alerts of the Prometheus Alertmanager with MS Teams</title>
+      <link>https://lapee79.github.io/en/article/prometheus-alertmanager-with-msteams/</link>
+      <pubDate>Fri, 02 Aug 2019 10:00:00 +0000</pubDate>
+      
+      <guid>https://lapee79.github.io/en/article/prometheus-alertmanager-with-msteams/</guid>
+      <description>Prometheus alerting through Alertmanager can be configured to send messages to Email, SMS or messangers. My company uses Microsoft Teams as team messanger. Alertmanager supports Email, HipChat, PagerDuty, Slack etc. natively except Microsoft Teams. So it needs to be used Webhook to send a third-party tool that sends messages to Microsoft Teams.
+This post assumes that you are using the Prometheus operator for monitoring your Kubernetes cluster. We&amp;rsquo;re going to know how to send Prometheus alerts to Microsoft Teams.</description>
+    </item>
+    
+  </channel>
+</rss>

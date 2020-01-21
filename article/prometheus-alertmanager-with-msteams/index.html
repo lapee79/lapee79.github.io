@@ -1,0 +1,633 @@
+<!doctype html>
+<html class="no-js" lang="ko">
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="author" content="lapee79">
+        <meta name="description" content="lapee79&#39;s IT Tech Blog.">
+        <meta name="keywords" content="blog,personal,posts,it,korean">
+        <meta name="generator" content="Hugo 0.53" />
+        <title> Alertmanager로 Prometheus의 알람을 Microsoft Teams에 발송하기 | lapee79&#39;s Tech Blog</title>
+        <meta name="description" content="Alertmanager로 Prometheus의 알람을 Microsoft Teams에 발송하기 - lapee79&#39;s IT Tech Blog.">
+        <meta itemprop="name" content="Alertmanager로 Prometheus의 알람을 Microsoft Teams에 발송하기">
+        <meta itemprop="description" content="Alertmanager로 Prometheus의 알람을 Microsoft Teams에 발송하기 - lapee79&#39;s IT Tech Blog.">
+        <meta property="og:title" content="Alertmanager로 Prometheus의 알람을 Microsoft Teams에 발송하기">
+        <meta property="og:description" content="Alertmanager로 Prometheus의 알람을 Microsoft Teams에 발송하기 - lapee79&#39;s IT Tech Blog.">
+        <meta property="og:image" content="https://www.gravatar.com/avatar/4068068eb59505ffebdc556d0aa2c9c9?size=200">
+        <meta property="og:url" content="https://lapee79.github.io/article/prometheus-alertmanager-with-msteams/">
+        <meta property="og:site_name" content="lapee79&#39;s Tech Blog">
+        <meta property="og:type" content="article">
+        <link rel="icon" type="image/png" href="https://lapee79.github.io/favicon-32x32.png" sizes="32x32">
+        <link rel="icon" type="image/png" href="https://lapee79.github.io/favicon-16x16.png" sizes="16x16">
+
+	
+
+        
+        
+        
+        
+        <link rel="stylesheet" href="https://lapee79.github.io/sass/combined.min.c7b63af25d73ccc22a82ec5d3a6dfccaf77ecee67014e5cc71dd9d8eafec0d4e.css">
+
+        
+
+        
+            
+        
+    </head>
+    <body class="bilberry-hugo-theme">
+        
+<nav class="permanentTopNav">
+
+    <div class="container">
+        <ul class="topnav">
+            
+        </ul>
+
+        
+            <div id="search-box" class="search">
+                <i class="fa fa-search"></i>
+                <input id="search" type="text" placeholder="검색 ...">
+            </div>
+        
+    </div>
+</nav>
+
+
+        <header>
+    <div class="container">
+        <div class="logo">
+            <a href="/" class="logo">
+                
+                    <img src="https://www.gravatar.com/avatar/4068068eb59505ffebdc556d0aa2c9c9?d=mm&size=200" alt="">
+                
+
+                <span class="overlay"><i class="fa fa-home"></i></span>
+            </a>
+        </div>
+        <div class="titles">
+            <h3 class="title"><a href="/">lapee79&#39;s Tech Blog</a></h3>
+            
+                <span class="subtitle">lapee79의 기술 지식 창고.</span>
+            
+        </div>
+
+    
+
+        
+        <div class="toggler permanentTopNav">
+        
+            <i class="fa fa-bars" aria-hidden="true"></i>
+        </div>
+    </div>
+    <script data-ad-client="ca-pub-6723773787660575" async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
+</header>
+
+
+        <div class="main container">
+            
+     
+    <div class="article-wrapper u-cf single">
+        
+            <a class="bubble" href="/article/prometheus-alertmanager-with-msteams/">
+    <i class="fa fa-fw fa-pencil"></i>
+</a>
+
+<article class="default article">
+    
+    <div class="featured-image">
+        <a href="/article/prometheus-alertmanager-with-msteams/">
+            
+                <img src="/article/prometheus-alertmanager-with-msteams/featuredImage_hu30910665284931ace4f57faa1e01d828_57002_700x350_fill_q95_box_smart1.jpg" alt="">
+            
+        </a>
+    </div>
+
+
+    <div class="content">
+    <h3><a href="/article/prometheus-alertmanager-with-msteams/">Alertmanager로 Prometheus의 알람을 Microsoft Teams에 발송하기</a></h3>
+    <div class="meta">
+        
+            
+                <span class="date moment">2019-08-02</span>
+            
+        
+
+        
+
+        
+            <span class="categories">
+                
+                    <a href="/categories/prometheus">Prometheus</a>
+                
+                    <a href="/categories/monitoring">Monitoring</a>
+                
+                    <a href="/categories/alertmanager">Alertmanager</a>
+                
+                    <a href="/categories/tutorials">Tutorials</a>
+                
+            </span>
+        
+
+        
+            <span class="author"><a href="/author/lapee79">lapee79</a></span>
+        
+    </div>
+
+    
+        
+
+<p><strong><a href="https://prometheus.io/docs/alerting/alertmanager/">Alertmanager</a></strong>를 사용하면 Prometheus에서 발생한 알람을 이메일, Slack, SMS 등의 클라이언트에 발송할 수 있습니다. 하지만 필자가 일하는 회사에서는 Slack이 아니라 Microsoft Teams를 사용하고 있었습니다. Alertmanager에서는 이메일, HipChat, PagerDuty, Slack 등은 네이티브로 지원하지만 Microsoft Teams는 Webhook을 이용하여 써드파티 도구를 사용해야 합니다. 여기에서는 Kubernetes 클러스터 모니터링을 위해 Prometheus operator가 설치된 상황에서 Microsoft Teams로 알람을 수신하여 모니터링할 수 있는 환경을 구축해보겠습니다.</p>
+
+<h3 id="microsoft-teams에서-incoming-webhook-url-받기">Microsoft Teams에서 Incoming Webhook URL 받기</h3>
+
+<p>여기에서는 Teams의 기본적인 내용은 스킵하고 채널에 Incoming Webhook을 구성하는 단계부터 설명하도록 하겠습니다.</p>
+
+<p>먼저 알람을 받기 위한 채널에서 <code>...</code> 을 클릭한 다음 커넥터를 선택합니다.</p>
+
+<p><img src="./teams-select-connector.png" alt="teams-select-connector" /></p>
+
+<p>커넥터 리스트에서 <code>Incoming Webhook</code> 커넥터를 선택합니다.</p>
+
+<p><img src="./select-incomingwebhook.png" alt="select-incomingwebhook" /></p>
+
+<p>나중에 webhook을 식별할 수 있도록 이름을 입력합니다. 그리고</p>
+
+<p><img src="./naming-incommingwebhook.png" alt="naming-incommingwebhook" /></p>
+
+<p>&ldquo;만들기&rdquo; 버튼을 클릭하면 메시지를 이 채널에 게시하는데 사용될 수 있는 webhook URL이 생성됩니다. 이 URL을 잘 복사해둡니다.</p>
+
+<p><img src="./webhook-url.png" alt="webhook-url" /></p>
+
+<h3 id="prometheus-operator의-alertmanager-설정">Prometheus operator의 Alertmanager 설정</h3>
+
+<p>이제 Alertmanager에서 Microsoft Teams 서드파티 도구로 알람을 전송할 수 있도록 <strong>alertmanager.yaml</strong> 설정 파일을 생성합니다.</p>
+
+<pre><code class="language-yaml">global:
+  resolve_timeout: 5m
+receivers:
+- name: prometheus-msteams
+  webhook_configs:
+  - url: &quot;http://prometheus-msteams:2000/alertmanager&quot;
+    send_resolved: true
+route:
+  group_by:
+  - job
+  group_interval: 5m
+  group_wait: 30s
+  receiver: prometheus-msteams
+  repeat_interval: 12h
+  routes:
+  - match:
+      alertname: Watchdog
+    receiver: prometheus-msteams
+</code></pre>
+
+<p>위 파일에서는 receiver를 webhook으로 설정하여 이름을 <strong>prometheus-msteams</strong>으로 지정했습니다. 이제 생성된 <strong>alertmanager.yaml</strong> 파일을 <strong>base64</strong>로 인코딩합니다.</p>
+
+<pre><code class="language-sh">cat alertmanager.yaml | base64
+Z2xvYmFsOgogIHJlc29sdmVfdGltZW91dDogNW0KcmVjZWl2ZXJzOgotIG5hbWU6IHByb21ldGhldXMtbXN0ZWFtcwogIHdlYmhvb2tfY29uZmlnczoKICAtIHVybDogImh0dHA6Ly9wcm9tZXRoZXVzLW1zdGVhbXM6MjAwMC9hbGVydG1hbmFnZXIiCiAgICBzZW5kX3Jlc29sdmVkOiB0cnVlCnJvdXRlOgogIGdyb3VwX2J5OgogIC0gam9iCiAgZ3JvdXBfaW50ZXJ2YWw6IDVtCiAgZ3JvdXBfd2FpdDogMzBzCiAgcmVjZWl2ZXI6IHByb21ldGhldXMtbXN0ZWFtcwogIHJlcGVhdF9pbnRlcnZhbDogMTJoCiAgcm91dGVzOgogIC0gbWF0Y2g6CiAgICAgIGFsZXJ0bmFtZTogV2F0Y2hkb2cKICAgIHJlY2VpdmVyOiBwcm9tZXRoZXVzLW1zdGVhbXMK
+</code></pre>
+
+<p>위에서 생성된 <strong>base64</strong>로 암호화된 문자열을 가지고 Prometheus operator의 Alertmanager에서 사용될 수 있도록 Secret 오브젝트를 생성해서 Kubernetes에 적용합니다.</p>
+
+<pre><code class="language-shell">cat &lt;&lt;EOF | kubectl apply -f -
+apiVersion: v1
+kind: Secret
+metadata:
+  name: alertmanager-main
+  namespace: monitoring
+type: Opaque
+data:
+  alertmanager.yaml: Z2xvYmFsOgogIHJlc29sdmVfdGltZW91dDogNW0KcmVjZWl2ZXJzOgotIG5hbWU6IHByb21ldGhldXMtbXN0ZWFtcwogIHdlYmhvb2tfY29uZmlnczoKICAtIHVybDogImh0dHA6Ly9wcm9tZXRoZXVzLW1zdGVhbXM6MjAwMC9hbGVydG1hbmFnZXIiCiAgICBzZW5kX3Jlc29sdmVkOiB0cnVlCnJvdXRlOgogIGdyb3VwX2J5OgogIC0gam9iCiAgZ3JvdXBfaW50ZXJ2YWw6IDVtCiAgZ3JvdXBfd2FpdDogMzBzCiAgcmVjZWl2ZXI6IHByb21ldGhldXMtbXN0ZWFtcwogIHJlcGVhdF9pbnRlcnZhbDogMTJoCiAgcm91dGVzOgogIC0gbWF0Y2g6CiAgICAgIGFsZXJ0bmFtZTogV2F0Y2hkb2cKICAgIHJlY2VpdmVyOiBwcm9tZXRoZXVzLW1zdGVhbXMK
+EOF
+</code></pre>
+
+<p>이제 Alertmanager는 webhook을 통해 알람을 발송할 준비가 되었습니다.</p>
+
+<h3 id="멀티-클러스터-환경에서-클러스터-식별-label-생성">멀티 클러스터 환경에서 클러스터 식별 Label 생성</h3>
+
+<p>다수의 Kubernetes 클러스터를 운영하는 상황에서는 어떤 클러스터에서 알람이 발생된 것인지 구분할 수 있어야 합니다. 따라서 클러스터를 구분할 수 있는 Label이 알람에 추가될 수 있도록 Prometheus에 <strong>externalLabels</strong>에 <code>cluster: &lt;CLUSTER_NAME&gt;</code> 형태로 정보를 추가해줍니다.</p>
+
+<pre><code class="language-shell">cat &lt;&lt;EOF | kubectl apply -f -
+apiVersion: monitoring.coreos.com/v1
+kind: Prometheus
+metadata:
+  labels:
+    prometheus: k8s
+  name: k8s
+  namespace: monitoring
+spec:
+  alerting:
+    alertmanagers:
+    - name: alertmanager-main
+      namespace: monitoring
+      port: web
+  baseImage: quay.io/prometheus/prometheus
+  nodeSelector:
+    beta.kubernetes.io/os: linux
+  replicas: 2
+  resources:
+    requests:
+      memory: 400Mi
+  ruleSelector:
+    matchLabels:
+      prometheus: k8s
+      role: alert-rules
+  securityContext:
+    fsGroup: 2000
+    runAsNonRoot: true
+    runAsUser: 1000
+  serviceAccountName: prometheus-k8s
+  serviceMonitorNamespaceSelector: {}
+  serviceMonitorSelector: {}
+  version: v2.7.2
+  externalLabels:
+    cluster: test
+</code></pre>
+
+<h3 id="prometheus-msteams-설정-및-구성">prometheus-msteams 설정 및 구성</h3>
+
+<p>이제 Prometheus에서 발생한 알람을 Microsoft Teams에 전달하는 <a href="https://github.com/bzon/prometheus-msteams">prometheus-msteams</a>를 설정하고 구성해봅시다.</p>
+
+<h4 id="chart-download">chart download</h4>
+
+<p>repository를 clone합니다.</p>
+
+<pre><code class="language-shell">git clone https://github.com/bzon/prometheus-msteams
+cd prometheus-msteams/chart
+</code></pre>
+
+<h4 id="microsoft-teams-message-card-template-수정">Microsoft Teams Message card template 수정</h4>
+
+<p>Microsoft Teams로 전송 시에 에러가 발생하지 않도록 기본 Microsoft Teams Message card template을 다음과 같이 수정합니다.</p>
+
+<pre><code class="language-shell">vim prometheus-msteams/card.tmpl
+{{ define &quot;teams.card&quot; }}
+{
+  &quot;@type&quot;: &quot;MessageCard&quot;,
+  &quot;@context&quot;: &quot;http://schema.org/extensions&quot;,
+  &quot;themeColor&quot;: &quot;{{- if eq .Status &quot;resolved&quot; -}}2DC72D
+                 {{- else if eq .Status &quot;firing&quot; -}}
+                    {{- if eq .CommonLabels.severity &quot;critical&quot; -}}8C1A1A
+                    {{- else if eq .CommonLabels.severity &quot;warning&quot; -}}FFA500
+                    {{- else -}}808080{{- end -}}
+                 {{- else -}}808080{{- end -}}&quot;,
+  &quot;summary&quot;: &quot;{{- if eq .CommonAnnotations.summary &quot;&quot; -}}
+                  {{- if eq .CommonAnnotations.message &quot;&quot; -}}
+                    {{- js .CommonLabels.cluster | reReplaceAll &quot;_&quot; &quot; &quot; | reReplaceAll `\\'` &quot;'&quot; -}}
+                  {{- else -}}
+                    {{- js .CommonAnnotations.message | reReplaceAll &quot;_&quot; &quot; &quot; | reReplaceAll `\\'` &quot;'&quot; -}}
+                  {{- end -}}
+              {{- else -}}
+                  {{- js .CommonAnnotations.summary | reReplaceAll &quot;_&quot; &quot; &quot; | reReplaceAll `\\'` &quot;'&quot; -}}
+              {{- end -}}&quot;,
+  &quot;title&quot;: &quot;Prometheus Alert ({{ .Status }})&quot;,
+  &quot;sections&quot;: [ {{$externalUrl := .ExternalURL}}
+  {{- range $index, $alert := .Alerts }}{{- if $index }},{{- end }}
+    {
+      &quot;activityTitle&quot;: &quot;[{{ js $alert.Annotations.description |  reReplaceAll &quot;_&quot; &quot; &quot; | reReplaceAll `\\'` &quot;'&quot; }}]({{ $externalUrl }})&quot;,
+      &quot;facts&quot;: [
+        {{- range $key, $value := $alert.Annotations }}
+        {
+          &quot;name&quot;: &quot;{{ $key }}&quot;,
+          &quot;value&quot;: &quot;{{ js $value | reReplaceAll &quot;_&quot; &quot; &quot; | reReplaceAll `\\'` &quot;'&quot; }}&quot;
+        },
+        {{- end -}}
+        {{$c := counter}}{{ range $key, $value := $alert.Labels }}{{if call $c}},{{ end }}
+        {
+          &quot;name&quot;: &quot;{{ $key }}&quot;,
+          &quot;value&quot;: &quot;{{ js $value | reReplaceAll &quot;_&quot; &quot; &quot; | reReplaceAll `\\'` &quot;'&quot; }}&quot;
+        }
+        {{- end }}
+      ],
+      &quot;markdown&quot;: true
+    }
+    {{- end }}
+  ]
+}
+{{ end }}
+</code></pre>
+
+<h4 id="helm-template으로-kubernetes에-배포">helm template으로 Kubernetes에 배포</h4>
+
+<p>Microsoft Teams에서 얻은 Incoming Webhook URL을 설정 값으로 넘기면서 Kubernetes에 배포합니다.</p>
+
+<pre><code class="language-shell">helm template prometheus-msteams/ --name prometheus-msteams --set connectors.alertmanager=https://outlook.office.com/webhook/xxxx/xxxx | kubectl apply -f -
+configmap/prometheus-msteams-config created
+configmap/prometheus-msteams-card-template created
+service/prometheus-msteams created
+deployment.apps/prometheus-msteams created
+</code></pre>
+
+<h3 id="수신된-알람-확인">수신된 알람 확인</h3>
+
+<p>이제 모든 설정이 완료되었으므로 알람이 발생하면 Microsoft Teams의 채널에 다음과 같이 알람을 받을 수 있을 것입니다.</p>
+
+<p><img src="./teams-alert-message.png" alt="teams-alert-message" /></p>
+
+<h3 id="related-links">Related links</h3>
+
+<ul>
+<li><a href="https://prometheus.io/docs/alerting/configuration/#webhook_config">https://prometheus.io/docs/alerting/configuration/#webhook_config</a></li>
+<li><a href="https://github.com/bzon/prometheus-msteams/blob/master/chart/README.md">https://github.com/bzon/prometheus-msteams/blob/master/chart/README.md</a></li>
+<li><a href="https://github.com/coreos/prometheus-operator/blob/ca400fdc3edd0af0df896a338eca270e115b74d7/Documentation/api.md#prometheusspec">https://github.com/coreos/prometheus-operator/blob/ca400fdc3edd0af0df896a338eca270e115b74d7/Documentation/api.md#prometheusspec</a></li>
+</ul>
+
+    
+</div>
+
+    
+<div class="footer">
+
+
+    
+        <div class="tags">
+            <i class="fa fa-tags"></i>
+            <div class="links">
+                
+                    <a href="/tags/prometheus">Prometheus</a>
+                
+                    <a href="/tags/alertmanager">Alertmanager</a>
+                
+                    <a href="/tags/microsoft-teams">Microsoft Teams</a>
+                
+                    <a href="/tags/tutorials">Tutorials</a>
+                
+            </div>
+        </div>
+    
+
+    
+    <div class="languages">
+        <i class="fa fa-language"></i>
+        <div class="links">
+            
+                <a href="https://lapee79.github.io/en/article/prometheus-alertmanager-with-msteams/">en</a>
+            
+        </div>
+    </div>
+    
+</div>
+
+</article>
+
+        
+    </div>
+
+    
+        <div id="disqus_thread"></div>
+<script type="application/javascript">
+    var disqus_config = function () {
+    
+    
+    
+    };
+    (function() {
+        if (["localhost", "127.0.0.1"].indexOf(window.location.hostname) != -1) {
+            document.getElementById('disqus_thread').innerHTML = 'Disqus comments not available by default when the website is previewed locally.';
+            return;
+        }
+        var d = document, s = d.createElement('script'); s.async = true;
+        s.src = '//' + "lapee79s-tech-blog" + '.disqus.com/embed.js';
+        s.setAttribute('data-timestamp', +new Date());
+        (d.head || d.body).appendChild(s);
+    })();
+</script>
+<noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+<a href="https://disqus.com" class="dsq-brlink">comments powered by <span class="logo-disqus">Disqus</span></a>
+    
+
+     
+
+        </div>
+
+        
+<footer>
+    <div class="container">
+
+        
+        <div class="recent-posts">
+            <strong>최근 글</strong>
+                <ul>
+                
+                    <li>
+                        <a href="/article/use-a-local-disk-by-local-volume-static-provisioner-in-kubernetes/">Kubernetes에서 Local Persistent Volume을 사용하여 local disk 사용</a>
+                    </li>
+                
+                    <li>
+                        <a href="/article/setup-production-ready-kubernetes-on-baremetal-with-kubespray/">Bare Metal 서버에 kubespray를 이용하여 Production 환경의 Kubernetes 클러스터 구축</a>
+                    </li>
+                
+                    <li>
+                        <a href="/article/monitoring-http-using-blackbox-exporter/">Blackbox exporter를 이용한 HTTP 모니터링</a>
+                    </li>
+                
+                    <li>
+                        <a href="/article/loki-kubernetes-logging/">Loki - Kubernetes 로깅</a>
+                    </li>
+                
+                    <li>
+                        <a href="/article/setup-a-production-ready-istio/">Setup a production-ready Istio</a>
+                    </li>
+                
+                    <li>
+                        <a href="/article/prometheus-alertmanager-with-msteams/">Alertmanager로 Prometheus의 알람을 Microsoft Teams에 발송하기</a>
+                    </li>
+                
+                    <li>
+                        <a href="/article/hosting-website-from-githubpages/">GitHub Pages에서 웹사이트 호스팅하기</a>
+                    </li>
+                
+                </ul>
+        </div>
+        
+
+        
+        <div class="categories">
+            <a href="/categories/"><strong>카테고리</strong></a>
+                <ul>
+                
+                    <li>
+                        <a href="/categories/tutorials">Tutorials (4)</a>
+                    </li>
+                
+                    <li>
+                        <a href="/categories/kubernetes">Kubernetes (3)</a>
+                    </li>
+                
+                    <li>
+                        <a href="/categories/devops">Devops (2)</a>
+                    </li>
+                
+                    <li>
+                        <a href="/categories/monitoring">Monitoring (2)</a>
+                    </li>
+                
+                    <li>
+                        <a href="/categories/prometheus">Prometheus (2)</a>
+                    </li>
+                
+                    <li>
+                        <a href="/categories/alertmanager">Alertmanager (1)</a>
+                    </li>
+                
+                    <li>
+                        <a href="/categories/exporter">Exporter (1)</a>
+                    </li>
+                
+                    <li>
+                        <a href="/categories/github-pages">Github pages (1)</a>
+                    </li>
+                
+                    <li>
+                        <a href="/categories/grafana">Grafana (1)</a>
+                    </li>
+                
+                    <li>
+                        <a href="/categories/istio">Istio (1)</a>
+                    </li>
+                
+                    <li>
+                        <a href="/categories/loki">Loki (1)</a>
+                    </li>
+                
+                    <li>
+                        <a href="/categories/service-mesh">Service mesh (1)</a>
+                    </li>
+                
+            </ul>
+        </div>
+        
+
+        <div class="right">
+            
+            <div class="external-profiles">
+                <strong>소셜 미디어</strong>
+
+                
+                
+                
+                
+                
+                
+                
+                
+                
+                
+                    <a href="https://github.com/lapee79" target="_blank"><i class="fa fa-github"></i></a>
+                
+                
+            </div>
+            
+
+            
+        </div>
+    </div>
+</footer>
+
+
+<div class="credits">
+    <div class="container">
+        <div class="copyright">
+            <a href="https://github.com/lapee79" target="_blank">
+                &copy;
+                
+                    2020
+                
+                by lapee79
+            </a>
+	    
+        </div>
+        <div class="author">
+            <a href="https://github.com/Lednerb/bilberry-hugo-theme" target="_blank">Bilberry Hugo Theme</a>
+        </div>
+    </div>
+</div>
+
+
+        
+<script type="application/javascript">
+var doNotTrack = false;
+if (!doNotTrack) {
+	window.ga=window.ga||function(){(ga.q=ga.q||[]).push(arguments)};ga.l=+new Date;
+	ga('create', 'UA-148360124-1', 'auto');
+	
+	ga('send', 'pageview');
+}
+</script>
+<script async src='https://www.google-analytics.com/analytics.js'></script>
+
+
+        
+
+        
+        
+        <script type="text/javascript" src="https://lapee79.github.io/js/externalDependencies.39c47e10e241eae2947b3fe21809c572.js" integrity="md5-OcR&#43;EOJB6uKUez/iGAnFcg=="></script>
+
+        
+        
+        <script type="text/javascript" src="https://lapee79.github.io/js/theme.ff50ae6dc1bfc220b23bf69dbb41b54e.js" integrity="md5-/1CubcG/wiCyO/adu0G1Tg=="></script>
+
+        <script>
+            $(".moment").each(function() {
+                $(this).text(
+                    moment( $(this).text() )
+                        .locale( "ko" )
+                        .format('LL')
+                );
+            });
+
+            $(".footnote-return sup").html("");
+        </script>
+
+        
+            
+        
+
+        
+            <script>
+    var client = algoliasearch("1RS3EVEBZI", "287247fefbadb3e2e5e0960034440842");
+    var index = client.initIndex("lapee79-tech-blog");
+
+    $('#search').autocomplete({ hint: false, autoselect: true, debug: false },
+      [
+        {
+          
+            source: $.fn.autocomplete.sources.hits(index, { hitsPerPage: 10 }),
+          
+          displayKey: function(suggestion) {
+            return suggestion.title || suggestion.author
+          },
+          templates: {
+            suggestion: function(suggestion) {
+                return "<span class='entry " + suggestion.type + "'>"
+                      + "<span class='title'>" + suggestion.title + "</span>"
+                      + "<span class='fa fa-fw " + suggestion.iconClass + "'></span>"
+                  + "</span>"
+                ;
+            },
+            empty: function() {
+              return "<span class='empty'>검색 결과가 없습니다.</span>"
+            },
+            footer: function() {
+              return '<div class="branding">Powered by <img src="https:\/\/lapee79.github.io\/dist\/algolia-logo-light.svg" /></div>'
+            }
+
+          },
+        }
+      ])
+      .on('autocomplete:selected', function(event, suggestion, dataset) {
+        window.location = (suggestion.url);
+      })
+      .keypress(function (event, suggestion) {
+        if (event.which == 13) {
+          window.location = (suggestion.url);
+        }
+      });
+</script>
+
+        
+
+
+    </body>
+</html>

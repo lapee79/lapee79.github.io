@@ -1,0 +1,176 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Tags on lapee79&#39;s Tech Blog</title>
+    <link>https://lapee79.github.io/en/tags/</link>
+    <description>Recent content in Tags on lapee79&#39;s Tech Blog</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <lastBuildDate>Fri, 02 Aug 2019 10:00:00 +0000</lastBuildDate>
+    
+	<atom:link href="https://lapee79.github.io/en/tags/index.xml" rel="self" type="application/rss+xml" />
+    
+    
+    <item>
+      <title>Alertmanager</title>
+      <link>https://lapee79.github.io/en/tags/alertmanager/</link>
+      <pubDate>Fri, 02 Aug 2019 10:00:00 +0000</pubDate>
+      
+      <guid>https://lapee79.github.io/en/tags/alertmanager/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>Baremetal</title>
+      <link>https://lapee79.github.io/en/tags/baremetal/</link>
+      <pubDate>Mon, 23 Dec 2019 10:00:00 +0000</pubDate>
+      
+      <guid>https://lapee79.github.io/en/tags/baremetal/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>Blackbox</title>
+      <link>https://lapee79.github.io/en/tags/blackbox/</link>
+      <pubDate>Sun, 27 Oct 2019 10:00:00 +0000</pubDate>
+      
+      <guid>https://lapee79.github.io/en/tags/blackbox/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>Exporter</title>
+      <link>https://lapee79.github.io/en/tags/exporter/</link>
+      <pubDate>Sun, 27 Oct 2019 10:00:00 +0000</pubDate>
+      
+      <guid>https://lapee79.github.io/en/tags/exporter/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>Grafana</title>
+      <link>https://lapee79.github.io/en/tags/grafana/</link>
+      <pubDate>Mon, 23 Sep 2019 10:00:00 +0000</pubDate>
+      
+      <guid>https://lapee79.github.io/en/tags/grafana/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>Istio</title>
+      <link>https://lapee79.github.io/en/tags/istio/</link>
+      <pubDate>Tue, 17 Sep 2019 10:00:00 +0000</pubDate>
+      
+      <guid>https://lapee79.github.io/en/tags/istio/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>Jaeger</title>
+      <link>https://lapee79.github.io/en/tags/jaeger/</link>
+      <pubDate>Tue, 17 Sep 2019 10:00:00 +0000</pubDate>
+      
+      <guid>https://lapee79.github.io/en/tags/jaeger/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>Kiali</title>
+      <link>https://lapee79.github.io/en/tags/kiali/</link>
+      <pubDate>Tue, 17 Sep 2019 10:00:00 +0000</pubDate>
+      
+      <guid>https://lapee79.github.io/en/tags/kiali/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>Kubernetes</title>
+      <link>https://lapee79.github.io/en/tags/kubernetes/</link>
+      <pubDate>Sun, 19 Jan 2020 10:00:00 +0000</pubDate>
+      
+      <guid>https://lapee79.github.io/en/tags/kubernetes/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>Kubespray</title>
+      <link>https://lapee79.github.io/en/tags/kubespray/</link>
+      <pubDate>Mon, 23 Dec 2019 10:00:00 +0000</pubDate>
+      
+      <guid>https://lapee79.github.io/en/tags/kubespray/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>Local Persistent Volumes</title>
+      <link>https://lapee79.github.io/en/tags/local-persistent-volumes/</link>
+      <pubDate>Sun, 19 Jan 2020 10:00:00 +0000</pubDate>
+      
+      <guid>https://lapee79.github.io/en/tags/local-persistent-volumes/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>Logging</title>
+      <link>https://lapee79.github.io/en/tags/logging/</link>
+      <pubDate>Mon, 23 Sep 2019 10:00:00 +0000</pubDate>
+      
+      <guid>https://lapee79.github.io/en/tags/logging/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>Loki</title>
+      <link>https://lapee79.github.io/en/tags/loki/</link>
+      <pubDate>Mon, 23 Sep 2019 10:00:00 +0000</pubDate>
+      
+      <guid>https://lapee79.github.io/en/tags/loki/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>Microsoft Teams</title>
+      <link>https://lapee79.github.io/en/tags/microsoft-teams/</link>
+      <pubDate>Fri, 02 Aug 2019 10:00:00 +0000</pubDate>
+      
+      <guid>https://lapee79.github.io/en/tags/microsoft-teams/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>Monitoring</title>
+      <link>https://lapee79.github.io/en/tags/monitoring/</link>
+      <pubDate>Sun, 27 Oct 2019 10:00:00 +0000</pubDate>
+      
+      <guid>https://lapee79.github.io/en/tags/monitoring/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>Production</title>
+      <link>https://lapee79.github.io/en/tags/production/</link>
+      <pubDate>Mon, 23 Dec 2019 10:00:00 +0000</pubDate>
+      
+      <guid>https://lapee79.github.io/en/tags/production/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>Prometheus</title>
+      <link>https://lapee79.github.io/en/tags/prometheus/</link>
+      <pubDate>Sun, 27 Oct 2019 10:00:00 +0000</pubDate>
+      
+      <guid>https://lapee79.github.io/en/tags/prometheus/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>Tutorials</title>
+      <link>https://lapee79.github.io/en/tags/tutorials/</link>
+      <pubDate>Sun, 27 Oct 2019 10:00:00 +0000</pubDate>
+      
+      <guid>https://lapee79.github.io/en/tags/tutorials/</guid>
+      <description></description>
+    </item>
+    
+  </channel>
+</rss>

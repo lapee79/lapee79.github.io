@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Loki on lapee79&#39;s Tech Blog</title>
+    <link>https://lapee79.github.io/tags/loki/</link>
+    <description>Recent content in Loki on lapee79&#39;s Tech Blog</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <lastBuildDate>Mon, 23 Sep 2019 10:00:00 +0000</lastBuildDate>
+    
+	<atom:link href="https://lapee79.github.io/tags/loki/index.xml" rel="self" type="application/rss+xml" />
+    
+    
+    <item>
+      <title>Loki - Kubernetes 로깅</title>
+      <link>https://lapee79.github.io/article/loki-kubernetes-logging/</link>
+      <pubDate>Mon, 23 Sep 2019 10:00:00 +0000</pubDate>
+      
+      <guid>https://lapee79.github.io/article/loki-kubernetes-logging/</guid>
+      <description>Loki는 Prometheus에 영감을 받아서 탄생한 클라우드 네이티브 인프라를 위한 로깅 서비스입니다.
+Loki는 무엇인가? KubeCon Seattle 2018에서 Grafana Labs에서 오픈소스로 공개된 Loki는 Kubernetes에서 Prometheus에 대한 경험이 있는 사용자에게 최적화된 로깅 백엔드입니다. Loki는 뛰어난 로그 검색 및 시각화 기능을 Grafana 6.0에서 제공합니다.
+Grafana Loki는 완전한 기능을 갖춘 로깅 스택으로 구성되어져 있습니다.
+Loki는 단일 로그 라인을 그대로 처리한다는 아이디어를 기반으로 만들어졌습니다. 이는 전체 텍스트 인덱싱을 하는 것이 아니라 Prometheus와 마찬가지로 동일한 label을 사용하여 관련 로그들을 그룹화한다는 것을 의미합니다.</description>
+    </item>
+    
+  </channel>
+</rss>

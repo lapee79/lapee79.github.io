@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Prometheus on lapee79&#39;s Tech Blog</title>
+    <link>https://lapee79.github.io/categories/prometheus/</link>
+    <description>Recent content in Prometheus on lapee79&#39;s Tech Blog</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <lastBuildDate>Sun, 27 Oct 2019 10:00:00 +0000</lastBuildDate>
+    
+	<atom:link href="https://lapee79.github.io/categories/prometheus/index.xml" rel="self" type="application/rss+xml" />
+    
+    
+    <item>
+      <title>Blackbox exporter를 이용한 HTTP 모니터링</title>
+      <link>https://lapee79.github.io/article/monitoring-http-using-blackbox-exporter/</link>
+      <pubDate>Sun, 27 Oct 2019 10:00:00 +0000</pubDate>
+      
+      <guid>https://lapee79.github.io/article/monitoring-http-using-blackbox-exporter/</guid>
+      <description>Prometheus에서는 Blackbox exporter 를 이용하여 외부에 있는 서비스의 HTTP/HTTPS, DNS, TCP, ICMP 모니터링을 할 수 있습니다. 이 포스트에서는 이중에 HTTP/HTTPS를 모니터링하는 방식을 간단하게 알아보도록 하겠습니다. Kubernetes 상에서 Prometheus를 사용하는 환경의 사용자를 대상으로 작성하였습니다.
+실행환경 여기에서는 다음과 같은 환경에서 Blackbox exporter를 사용한 모니터링 실습을 진행합니다.
+ Kubernetes Prometheus operator  Blackbox exporter 설정 파일 생성 웹 서비스 엔드포인트를 모니터링하기 위한 http 모듈을 구성하기 위해 Blackbox configuration 파일을 ConfigMap으로 작성합니다.
+apiVersion: v1 kind: ConfigMap metadata: name: prometheus-blackbox-exporter labels: app: prometheus-blackbox-exporter data: blackbox.</description>
+    </item>
+    
+    <item>
+      <title>Alertmanager로 Prometheus의 알람을 Microsoft Teams에 발송하기</title>
+      <link>https://lapee79.github.io/article/prometheus-alertmanager-with-msteams/</link>
+      <pubDate>Fri, 02 Aug 2019 10:00:00 +0000</pubDate>
+      
+      <guid>https://lapee79.github.io/article/prometheus-alertmanager-with-msteams/</guid>
+      <description>Alertmanager를 사용하면 Prometheus에서 발생한 알람을 이메일, Slack, SMS 등의 클라이언트에 발송할 수 있습니다. 하지만 필자가 일하는 회사에서는 Slack이 아니라 Microsoft Teams를 사용하고 있었습니다. Alertmanager에서는 이메일, HipChat, PagerDuty, Slack 등은 네이티브로 지원하지만 Microsoft Teams는 Webhook을 이용하여 써드파티 도구를 사용해야 합니다. 여기에서는 Kubernetes 클러스터 모니터링을 위해 Prometheus operator가 설치된 상황에서 Microsoft Teams로 알람을 수신하여 모니터링할 수 있는 환경을 구축해보겠습니다.
+Microsoft Teams에서 Incoming Webhook URL 받기 여기에서는 Teams의 기본적인 내용은 스킵하고 채널에 Incoming Webhook을 구성하는 단계부터 설명하도록 하겠습니다.</description>
+    </item>
+    
+  </channel>
+</rss>

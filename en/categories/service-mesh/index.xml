@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Service Mesh on lapee79&#39;s Tech Blog</title>
+    <link>https://lapee79.github.io/en/categories/service-mesh/</link>
+    <description>Recent content in Service Mesh on lapee79&#39;s Tech Blog</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <lastBuildDate>Tue, 17 Sep 2019 10:00:00 +0000</lastBuildDate>
+    
+	<atom:link href="https://lapee79.github.io/en/categories/service-mesh/index.xml" rel="self" type="application/rss+xml" />
+    
+    
+    <item>
+      <title>Setup a production-ready Istio</title>
+      <link>https://lapee79.github.io/en/article/setup-a-production-ready-istio/</link>
+      <pubDate>Tue, 17 Sep 2019 10:00:00 +0000</pubDate>
+      
+      <guid>https://lapee79.github.io/en/article/setup-a-production-ready-istio/</guid>
+      <description>Istio is open source service mesh. It adds an abstraction layer to the network. It also provides capabilities to connect, manage and secure microservices.
+Istio provides built-in configuration profiles. But for production environment, we need to :
+ improve performance by using tuned settings. enable SDS to secure gateways. integrate with Prometheus operator, Grafana, Jaeger and Kiali.  Now we&amp;rsquo;ll set up Istio on Kubernetes for production environment.
+Install a istio using tuned settings  Download Istio release.</description>
+    </item>
+    
+  </channel>
+</rss>

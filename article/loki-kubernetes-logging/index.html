@@ -1,0 +1,569 @@
+<!doctype html>
+<html class="no-js" lang="ko">
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="author" content="lapee79">
+        <meta name="description" content="lapee79&#39;s IT Tech Blog.">
+        <meta name="keywords" content="blog,personal,posts,it,korean">
+        <meta name="generator" content="Hugo 0.53" />
+        <title> Loki - Kubernetes 로깅 | lapee79&#39;s Tech Blog</title>
+        <meta name="description" content="Loki - Kubernetes 로깅 - lapee79&#39;s IT Tech Blog.">
+        <meta itemprop="name" content="Loki - Kubernetes 로깅">
+        <meta itemprop="description" content="Loki - Kubernetes 로깅 - lapee79&#39;s IT Tech Blog.">
+        <meta property="og:title" content="Loki - Kubernetes 로깅">
+        <meta property="og:description" content="Loki - Kubernetes 로깅 - lapee79&#39;s IT Tech Blog.">
+        <meta property="og:image" content="https://www.gravatar.com/avatar/4068068eb59505ffebdc556d0aa2c9c9?size=200">
+        <meta property="og:url" content="https://lapee79.github.io/article/loki-kubernetes-logging/">
+        <meta property="og:site_name" content="lapee79&#39;s Tech Blog">
+        <meta property="og:type" content="article">
+        <link rel="icon" type="image/png" href="https://lapee79.github.io/favicon-32x32.png" sizes="32x32">
+        <link rel="icon" type="image/png" href="https://lapee79.github.io/favicon-16x16.png" sizes="16x16">
+
+	
+
+        
+        
+        
+        
+        <link rel="stylesheet" href="https://lapee79.github.io/sass/combined.min.c7b63af25d73ccc22a82ec5d3a6dfccaf77ecee67014e5cc71dd9d8eafec0d4e.css">
+
+        
+
+        
+            
+        
+    </head>
+    <body class="bilberry-hugo-theme">
+        
+<nav class="permanentTopNav">
+
+    <div class="container">
+        <ul class="topnav">
+            
+        </ul>
+
+        
+            <div id="search-box" class="search">
+                <i class="fa fa-search"></i>
+                <input id="search" type="text" placeholder="검색 ...">
+            </div>
+        
+    </div>
+</nav>
+
+
+        <header>
+    <div class="container">
+        <div class="logo">
+            <a href="/" class="logo">
+                
+                    <img src="https://www.gravatar.com/avatar/4068068eb59505ffebdc556d0aa2c9c9?d=mm&size=200" alt="">
+                
+
+                <span class="overlay"><i class="fa fa-home"></i></span>
+            </a>
+        </div>
+        <div class="titles">
+            <h3 class="title"><a href="/">lapee79&#39;s Tech Blog</a></h3>
+            
+                <span class="subtitle">lapee79의 기술 지식 창고.</span>
+            
+        </div>
+
+    
+
+        
+        <div class="toggler permanentTopNav">
+        
+            <i class="fa fa-bars" aria-hidden="true"></i>
+        </div>
+    </div>
+    <script data-ad-client="ca-pub-6723773787660575" async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
+</header>
+
+
+        <div class="main container">
+            
+     
+    <div class="article-wrapper u-cf single">
+        
+            <a class="bubble" href="/article/loki-kubernetes-logging/">
+    <i class="fa fa-fw fa-pencil"></i>
+</a>
+
+<article class="default article">
+    
+    <div class="featured-image">
+        <a href="/article/loki-kubernetes-logging/">
+            
+                <img src="/article/loki-kubernetes-logging/featuredImage_hu32ea944e146594c1b0cba1925deb2048_29654_700x350_fill_q95_box_smart1.jpg" alt="">
+            
+        </a>
+    </div>
+
+
+    <div class="content">
+    <h3><a href="/article/loki-kubernetes-logging/">Loki - Kubernetes 로깅</a></h3>
+    <div class="meta">
+        
+            
+                <span class="date moment">2019-09-23</span>
+            
+        
+
+        
+
+        
+            <span class="categories">
+                
+                    <a href="/categories/loki">Loki</a>
+                
+                    <a href="/categories/grafana">Grafana</a>
+                
+                    <a href="/categories/kubernetes">Kubernetes</a>
+                
+                    <a href="/categories/tutorials">Tutorials</a>
+                
+            </span>
+        
+
+        
+            <span class="author"><a href="/author/lapee79">lapee79</a></span>
+        
+    </div>
+
+    
+        
+
+<p><a href="https://grafana.com/loki">Loki</a>는 Prometheus에 영감을 받아서 탄생한 클라우드 네이티브 인프라를 위한 로깅 서비스입니다.</p>
+
+<h2 id="loki는-무엇인가">Loki는 무엇인가?</h2>
+
+<p>KubeCon Seattle 2018에서 Grafana Labs에서 오픈소스로 공개된 Loki는 Kubernetes에서 Prometheus에 대한 경험이 있는 사용자에게 최적화된 로깅 백엔드입니다. Loki는 뛰어난 로그 검색 및 시각화 기능을 Grafana 6.0에서 제공합니다.</p>
+
+<p>Grafana Loki는 완전한 기능을 갖춘 로깅 스택으로 구성되어져 있습니다.</p>
+
+<p>Loki는 단일 로그 라인을 그대로 처리한다는 아이디어를 기반으로 만들어졌습니다. 이는 전체 텍스트 인덱싱을 하는 것이 아니라 Prometheus와 마찬가지로 동일한 label을 사용하여 관련 로그들을 그룹화한다는 것을 의미합니다. 이 방식은 훨씬 효율적이며 확장성이 좋습니다.</p>
+
+<h2 id="구성요소">구성요소</h2>
+
+<ul>
+<li><strong>Loki</strong>: 메인 서버 구성요소를 Loki라고 부르며 전달되는 로그들을 영구 저장하고 클라이언트의 LogQL 쿼리를 실행합니다. Loki는 확장성이 뛰어난 Prometheus 백엔드인 Cortext와 높은 수준의 아키텍처를 공유합니다.</li>
+<li><strong>Promtail</strong>: 로그를 중앙 저장소로 전달하려면 에이전트가 필요합니다. Promtail은 모니터링해야 하는 모든 노드에 배포되어 로그를 Loki로 전달합니다. 또한 Promtail은 쉽게 쿼리할 수 있도록 label을 첨부하는 등의 로그 라인들을 사전 처리하는 중요한 작업도 수행합니다.</li>
+<li><strong>Grafana</strong>: Grafana 6.0 이상에서 사용할 수 있는 Explore 기능은 사용자와 Loki 사이의 중요한 접점입니다. Explore는 로그를 발견하고 분석하는데 사용됩니다.</li>
+</ul>
+
+<p><img src="./logging-architecture.png" alt="Logging Architecture" /></p>
+
+<h2 id="helm-chart를-사용하여-loki와-promtail을-kubernetes에-배포">Helm Chart를 사용하여 Loki와 Promtail을 Kubernetes에 배포</h2>
+
+<p>Kubernetes 클러스터에 Helm이 설치되었는지 확인한 다음 Loki의 chart 레포지토리를 Helm에 추가합니다.</p>
+
+<pre><code class="language-shell">helm repo add loki https://grafana.github.io/loki/charts
+</code></pre>
+
+<p>다음 명령어를 실행하여 chart 레포지토리를 업데이트할 수 있습니다.</p>
+
+<pre><code class="language-shell">helm repo update
+</code></pre>
+
+<p>loki-stack namespace에 배포합니다.</p>
+
+<pre><code class="language-shell">helm upgrade --install loki --namespace=loki-stack loki/loki-stack
+</code></pre>
+
+<p>설치를 검증합니다.</p>
+
+<pre><code class="language-shell">kubectl --namespace=loki-stack get services
+kubectl --namespace=loki-stack get pods
+</code></pre>
+
+<h2 id="grafana에-loki를-data-source로-추가">Grafana에 Loki를 Data Source로 추가</h2>
+
+<p>Grafana는 6.0 이상 버전에서 Loki를 기본적으로 지원하지만 6.3 이상을 사용하는 것이 좋습니다.</p>
+
+<ol>
+<li>Grafana에 로그인합니다.</li>
+<li>좌측 사이드바의 톱니 아이콘을 통해 <code>Configuration</code> &gt; <code>Data Sources</code>로 갑니다.</li>
+<li><code>+ Add data source</code> 버튼을 클릭합니다.</li>
+<li>리스트에서 Loki를 선택합니다.</li>
+<li>http URL 필드에는 Loki server의 주소를 작성해야 합니다. 예로 Kubernetes에 Loki를 배포했다면 <code>http://loki.loki-stack:3100</code> 이 주소가 됩니다.</li>
+<li>로그를 보려면 사이드바에서 Explore를 클릭하고, Loki datasource를 선택한 다음 Log labels 버특을 사용하여 log stream을 선택합니다.</li>
+</ol>
+
+<h2 id="쿼리">쿼리</h2>
+
+<p>분석을 위해 Loki에서 이전에 수집한 로그들을 다시 가져오려면, LogQL을 지원하는 클라이언트가 필요합니다. (예. <code>Grafana</code>)</p>
+
+<p><img src="./query-grafana.png" alt="Query from Grafana" /></p>
+
+<h3 id="logql">LogQL</h3>
+
+<p>Loki는 <em>LogQL</em> 이라는 Loki server에서 로그를 쿼리하기 위한 고유한 언어를 가집니다. 선택 label을 가진 분산 <code>grep</code> 으로 생각할 수 있습니다.</p>
+
+<p>로그 쿼리는 <strong>log stream selector</strong>와 <strong>filter expression</strong> 이렇게 두 부분으로 구성되어져 있습니다. 성능상의 이유로 인해 Prometheus 스타일의 log stream selector를 사용하여 로그 스트림 세트를 선택하는 것으로 시작해야 합니다.</p>
+
+<p>log stream selector는 로그 스트림을 관리할 수 있는 수준으로 줄인 다음 정규 검색 표현식을 사용하여 분산된 grep을 수행합니다.</p>
+
+<h3 id="log-stream-selector">Log Stream Selector</h3>
+
+<p>쿼리 표현식의 label 부분을 중괄호 <code>{}</code>로 묶은 다음 key value 구문을 사용하여 label을 선택합니다. 다수의 label 표현식들은 쉼표로 구분합니다.</p>
+
+<pre><code>{app=&quot;mysql&quot;,name=&quot;mysql-backup&quot;}
+</code></pre>
+
+<p>현재 다음 label 매칭 연산자들이 지원됩니다.</p>
+
+<ul>
+<li><code>=</code> 정확히 동일함.</li>
+<li><code>!=</code> 동일하지 않음.</li>
+<li><code>=~</code> 정규표현식 매칭.</li>
+<li><code>!~</code> 정규표현식에 매칭되지 않음.</li>
+</ul>
+
+<p>예제:</p>
+
+<ul>
+<li><code>{name=~&quot;mysql.+&quot;}</code></li>
+<li><code>{name!~&quot;mysql.+&quot;}</code></li>
+</ul>
+
+<p><a href="https://prometheus.io/docs/prometheus/latest/querying/basics/#instant-vector-selectors">Prometheus Label Selectors</a>에 적용되는 규칙이 Loki Log Stream Selectors에 동일하게 적용됩니다.</p>
+
+<h3 id="filter-expression">Filter Expression</h3>
+
+<p>Log Stream Selector를 작성한 후 검색 표현식을 작성하여 결과값을 추가로 필터링할 수 있습니다. 검색 표현식은 단순 텍스트 또는 정규 표현식이 될 수 있습니다.</p>
+
+<p>예제 쿼리:</p>
+
+<ul>
+<li><code>{job=&quot;mysql&quot;} |= &quot;error&quot;</code></li>
+<li><code>{name=&quot;kafka&quot;} |~ &quot;tsdb-ops.*io:2003&quot;</code></li>
+<li><code>{instance=~&quot;kafka-[23]&quot;,name=&quot;kafka&quot;} != kafka.server:type=ReplicaManager</code></li>
+</ul>
+
+<p>다음 예제처럼 필터 연산자들은 연결될 수 있으며, 표현식을 순차적으로 필터링합니다. 결과값으로 출력되는 로그 라인들은 <em>모든</em> 필터를 충족합니다.</p>
+
+<pre><code>{job=&quot;mysql&quot;} |= &quot;error&quot; != &quot;timeout&quot;
+</code></pre>
+
+<p>다음과 같은 필터 유형이 구현되어져 있습니다.</p>
+
+<ul>
+<li><code>|=</code> 문자열을 포함하는 라인.</li>
+<li><code>!=</code> 문자열을 포함하지 않는 라인.</li>
+<li><code>|~</code> 정규 표현식에 매칭되는 라인.</li>
+<li><code>!~</code> 정규 표현식에 매칭되지 않는 라인.</li>
+</ul>
+
+<p>정규 표현식은 <a href="https://github.com/google/re2/wiki/Syntax">RE2 syntax</a>를 수용합니다. 매칭은 기본적으로 대소 문자를 구분하며 <code>(?i)</code>를 정규 표현식 앞에 접두사로 사용하면 대소 문자를 구분하지 않도록 전환할 수 있습니다.</p>
+
+<h2 id="related-links">Related links</h2>
+
+<ul>
+<li><a href="https://grafana.com/oss/loki">https://grafana.com/oss/loki</a></li>
+<li><a href="https://github.com/grafana/loki/tree/master/production/helm">https://github.com/grafana/loki/tree/master/production/helm</a></li>
+<li><a href="https://github.com/grafana/loki/blob/master/docs/querying.md">https://github.com/grafana/loki/blob/master/docs/querying.md</a></li>
+</ul>
+
+    
+</div>
+
+    
+<div class="footer">
+
+
+    
+        <div class="tags">
+            <i class="fa fa-tags"></i>
+            <div class="links">
+                
+                    <a href="/tags/loki">Loki</a>
+                
+                    <a href="/tags/grafana">Grafana</a>
+                
+                    <a href="/tags/kubernetes">Kubernetes</a>
+                
+                    <a href="/tags/tutorials">Tutorials</a>
+                
+                    <a href="/tags/logging">logging</a>
+                
+            </div>
+        </div>
+    
+
+    
+    <div class="languages">
+        <i class="fa fa-language"></i>
+        <div class="links">
+            
+                <a href="https://lapee79.github.io/en/article/loki-kubernetes-logging/">en</a>
+            
+        </div>
+    </div>
+    
+</div>
+
+</article>
+
+        
+    </div>
+
+    
+        <div id="disqus_thread"></div>
+<script type="application/javascript">
+    var disqus_config = function () {
+    
+    
+    
+    };
+    (function() {
+        if (["localhost", "127.0.0.1"].indexOf(window.location.hostname) != -1) {
+            document.getElementById('disqus_thread').innerHTML = 'Disqus comments not available by default when the website is previewed locally.';
+            return;
+        }
+        var d = document, s = d.createElement('script'); s.async = true;
+        s.src = '//' + "lapee79s-tech-blog" + '.disqus.com/embed.js';
+        s.setAttribute('data-timestamp', +new Date());
+        (d.head || d.body).appendChild(s);
+    })();
+</script>
+<noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+<a href="https://disqus.com" class="dsq-brlink">comments powered by <span class="logo-disqus">Disqus</span></a>
+    
+
+     
+
+        </div>
+
+        
+<footer>
+    <div class="container">
+
+        
+        <div class="recent-posts">
+            <strong>최근 글</strong>
+                <ul>
+                
+                    <li>
+                        <a href="/article/use-a-local-disk-by-local-volume-static-provisioner-in-kubernetes/">Kubernetes에서 Local Persistent Volume을 사용하여 local disk 사용</a>
+                    </li>
+                
+                    <li>
+                        <a href="/article/setup-production-ready-kubernetes-on-baremetal-with-kubespray/">Bare Metal 서버에 kubespray를 이용하여 Production 환경의 Kubernetes 클러스터 구축</a>
+                    </li>
+                
+                    <li>
+                        <a href="/article/monitoring-http-using-blackbox-exporter/">Blackbox exporter를 이용한 HTTP 모니터링</a>
+                    </li>
+                
+                    <li>
+                        <a href="/article/loki-kubernetes-logging/">Loki - Kubernetes 로깅</a>
+                    </li>
+                
+                    <li>
+                        <a href="/article/setup-a-production-ready-istio/">Setup a production-ready Istio</a>
+                    </li>
+                
+                    <li>
+                        <a href="/article/prometheus-alertmanager-with-msteams/">Alertmanager로 Prometheus의 알람을 Microsoft Teams에 발송하기</a>
+                    </li>
+                
+                    <li>
+                        <a href="/article/hosting-website-from-githubpages/">GitHub Pages에서 웹사이트 호스팅하기</a>
+                    </li>
+                
+                </ul>
+        </div>
+        
+
+        
+        <div class="categories">
+            <a href="/categories/"><strong>카테고리</strong></a>
+                <ul>
+                
+                    <li>
+                        <a href="/categories/tutorials">Tutorials (4)</a>
+                    </li>
+                
+                    <li>
+                        <a href="/categories/kubernetes">Kubernetes (3)</a>
+                    </li>
+                
+                    <li>
+                        <a href="/categories/devops">Devops (2)</a>
+                    </li>
+                
+                    <li>
+                        <a href="/categories/monitoring">Monitoring (2)</a>
+                    </li>
+                
+                    <li>
+                        <a href="/categories/prometheus">Prometheus (2)</a>
+                    </li>
+                
+                    <li>
+                        <a href="/categories/alertmanager">Alertmanager (1)</a>
+                    </li>
+                
+                    <li>
+                        <a href="/categories/exporter">Exporter (1)</a>
+                    </li>
+                
+                    <li>
+                        <a href="/categories/github-pages">Github pages (1)</a>
+                    </li>
+                
+                    <li>
+                        <a href="/categories/grafana">Grafana (1)</a>
+                    </li>
+                
+                    <li>
+                        <a href="/categories/istio">Istio (1)</a>
+                    </li>
+                
+                    <li>
+                        <a href="/categories/loki">Loki (1)</a>
+                    </li>
+                
+                    <li>
+                        <a href="/categories/service-mesh">Service mesh (1)</a>
+                    </li>
+                
+            </ul>
+        </div>
+        
+
+        <div class="right">
+            
+            <div class="external-profiles">
+                <strong>소셜 미디어</strong>
+
+                
+                
+                
+                
+                
+                
+                
+                
+                
+                
+                    <a href="https://github.com/lapee79" target="_blank"><i class="fa fa-github"></i></a>
+                
+                
+            </div>
+            
+
+            
+        </div>
+    </div>
+</footer>
+
+
+<div class="credits">
+    <div class="container">
+        <div class="copyright">
+            <a href="https://github.com/lapee79" target="_blank">
+                &copy;
+                
+                    2020
+                
+                by lapee79
+            </a>
+	    
+        </div>
+        <div class="author">
+            <a href="https://github.com/Lednerb/bilberry-hugo-theme" target="_blank">Bilberry Hugo Theme</a>
+        </div>
+    </div>
+</div>
+
+
+        
+<script type="application/javascript">
+var doNotTrack = false;
+if (!doNotTrack) {
+	window.ga=window.ga||function(){(ga.q=ga.q||[]).push(arguments)};ga.l=+new Date;
+	ga('create', 'UA-148360124-1', 'auto');
+	
+	ga('send', 'pageview');
+}
+</script>
+<script async src='https://www.google-analytics.com/analytics.js'></script>
+
+
+        
+
+        
+        
+        <script type="text/javascript" src="https://lapee79.github.io/js/externalDependencies.39c47e10e241eae2947b3fe21809c572.js" integrity="md5-OcR&#43;EOJB6uKUez/iGAnFcg=="></script>
+
+        
+        
+        <script type="text/javascript" src="https://lapee79.github.io/js/theme.ff50ae6dc1bfc220b23bf69dbb41b54e.js" integrity="md5-/1CubcG/wiCyO/adu0G1Tg=="></script>
+
+        <script>
+            $(".moment").each(function() {
+                $(this).text(
+                    moment( $(this).text() )
+                        .locale( "ko" )
+                        .format('LL')
+                );
+            });
+
+            $(".footnote-return sup").html("");
+        </script>
+
+        
+            
+        
+
+        
+            <script>
+    var client = algoliasearch("1RS3EVEBZI", "287247fefbadb3e2e5e0960034440842");
+    var index = client.initIndex("lapee79-tech-blog");
+
+    $('#search').autocomplete({ hint: false, autoselect: true, debug: false },
+      [
+        {
+          
+            source: $.fn.autocomplete.sources.hits(index, { hitsPerPage: 10 }),
+          
+          displayKey: function(suggestion) {
+            return suggestion.title || suggestion.author
+          },
+          templates: {
+            suggestion: function(suggestion) {
+                return "<span class='entry " + suggestion.type + "'>"
+                      + "<span class='title'>" + suggestion.title + "</span>"
+                      + "<span class='fa fa-fw " + suggestion.iconClass + "'></span>"
+                  + "</span>"
+                ;
+            },
+            empty: function() {
+              return "<span class='empty'>검색 결과가 없습니다.</span>"
+            },
+            footer: function() {
+              return '<div class="branding">Powered by <img src="https:\/\/lapee79.github.io\/dist\/algolia-logo-light.svg" /></div>'
+            }
+
+          },
+        }
+      ])
+      .on('autocomplete:selected', function(event, suggestion, dataset) {
+        window.location = (suggestion.url);
+      })
+      .keypress(function (event, suggestion) {
+        if (event.which == 13) {
+          window.location = (suggestion.url);
+        }
+      });
+</script>
+
+        
+
+
+    </body>
+</html>

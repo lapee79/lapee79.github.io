@@ -1,0 +1,830 @@
+<!doctype html>
+<html class="no-js" lang="ko">
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="author" content="lapee79">
+        <meta name="description" content="lapee79&#39;s IT Tech Blog.">
+        <meta name="keywords" content="blog,personal,posts,it,korean">
+        <meta name="generator" content="Hugo 0.53" />
+        <title> Bare Metal 서버에 kubespray를 이용하여 Production 환경의 Kubernetes 클러스터 구축 | lapee79&#39;s Tech Blog</title>
+        <meta name="description" content="Bare Metal 서버에 kubespray를 이용하여 Production 환경의 Kubernetes 클러스터 구축 - lapee79&#39;s IT Tech Blog.">
+        <meta itemprop="name" content="Bare Metal 서버에 kubespray를 이용하여 Production 환경의 Kubernetes 클러스터 구축">
+        <meta itemprop="description" content="Bare Metal 서버에 kubespray를 이용하여 Production 환경의 Kubernetes 클러스터 구축 - lapee79&#39;s IT Tech Blog.">
+        <meta property="og:title" content="Bare Metal 서버에 kubespray를 이용하여 Production 환경의 Kubernetes 클러스터 구축">
+        <meta property="og:description" content="Bare Metal 서버에 kubespray를 이용하여 Production 환경의 Kubernetes 클러스터 구축 - lapee79&#39;s IT Tech Blog.">
+        <meta property="og:image" content="https://www.gravatar.com/avatar/4068068eb59505ffebdc556d0aa2c9c9?size=200">
+        <meta property="og:url" content="https://lapee79.github.io/article/setup-production-ready-kubernetes-on-baremetal-with-kubespray/">
+        <meta property="og:site_name" content="lapee79&#39;s Tech Blog">
+        <meta property="og:type" content="article">
+        <link rel="icon" type="image/png" href="https://lapee79.github.io/favicon-32x32.png" sizes="32x32">
+        <link rel="icon" type="image/png" href="https://lapee79.github.io/favicon-16x16.png" sizes="16x16">
+
+	
+
+        
+        
+        
+        
+        <link rel="stylesheet" href="https://lapee79.github.io/sass/combined.min.c7b63af25d73ccc22a82ec5d3a6dfccaf77ecee67014e5cc71dd9d8eafec0d4e.css">
+
+        
+
+        
+            
+        
+    </head>
+    <body class="bilberry-hugo-theme">
+        
+<nav class="permanentTopNav">
+
+    <div class="container">
+        <ul class="topnav">
+            
+        </ul>
+
+        
+            <div id="search-box" class="search">
+                <i class="fa fa-search"></i>
+                <input id="search" type="text" placeholder="검색 ...">
+            </div>
+        
+    </div>
+</nav>
+
+
+        <header>
+    <div class="container">
+        <div class="logo">
+            <a href="/" class="logo">
+                
+                    <img src="https://www.gravatar.com/avatar/4068068eb59505ffebdc556d0aa2c9c9?d=mm&size=200" alt="">
+                
+
+                <span class="overlay"><i class="fa fa-home"></i></span>
+            </a>
+        </div>
+        <div class="titles">
+            <h3 class="title"><a href="/">lapee79&#39;s Tech Blog</a></h3>
+            
+                <span class="subtitle">lapee79의 기술 지식 창고.</span>
+            
+        </div>
+
+    
+
+        
+        <div class="toggler permanentTopNav">
+        
+            <i class="fa fa-bars" aria-hidden="true"></i>
+        </div>
+    </div>
+    <script data-ad-client="ca-pub-6723773787660575" async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
+</header>
+
+
+        <div class="main container">
+            
+     
+    <div class="article-wrapper u-cf single">
+        
+            <a class="bubble" href="/article/setup-production-ready-kubernetes-on-baremetal-with-kubespray/">
+    <i class="fa fa-fw fa-pencil"></i>
+</a>
+
+<article class="default article">
+    
+    <div class="featured-image">
+        <a href="/article/setup-production-ready-kubernetes-on-baremetal-with-kubespray/">
+            
+                <img src="/article/setup-production-ready-kubernetes-on-baremetal-with-kubespray/featuredImage_hu3bced1e920add2777bea4e2136b2d62b_53357_700x350_fill_q95_box_smart1_2.png" alt="">
+            
+        </a>
+    </div>
+
+
+    <div class="content">
+    <h3><a href="/article/setup-production-ready-kubernetes-on-baremetal-with-kubespray/">Bare Metal 서버에 kubespray를 이용하여 Production 환경의 Kubernetes 클러스터 구축</a></h3>
+    <div class="meta">
+        
+            
+                <span class="date moment">2019-12-23</span>
+            
+        
+
+        
+
+        
+            <span class="categories">
+                
+                    <a href="/categories/kubernetes">Kubernetes</a>
+                
+                    <a href="/categories/devops">DevOps</a>
+                
+            </span>
+        
+
+        
+            <span class="author"><a href="/author/lapee79">lapee79</a></span>
+        
+    </div>
+
+    
+        
+
+<p><a href="https://kubespray.io">Kubespray</a>는 일반적인 OS 설정과 Kubernetes 구성/관리 작업에 관련된 <a href="https://docs.ansible.com/">Ansible</a> playbook들과 inventory 그리고 배포 도구들을 조합한 소프트웨어입니다.</p>
+
+<h2 id="구성환경">구성환경</h2>
+
+<h3 id="하드웨어">하드웨어</h3>
+
+<ul>
+<li>5 Nodes: VM 또는 물리 서버</li>
+
+<li><p>Memory: 8GB</p></li>
+
+<li><p>CPU: 4Core</p></li>
+
+<li><p>디스크: 120GB 이상</p></li>
+</ul>
+
+<h3 id="소프트웨어">소프트웨어</h3>
+
+<p><code>Kubernetes nodes</code></p>
+
+<ul>
+<li>Ubuntu 18.04</li>
+<li>Python</li>
+<li>SSH Server</li>
+<li>sudo 권한을 가진 유저</li>
+</ul>
+
+<p><code>Kubespray machine</code></p>
+
+<ul>
+<li>Ansible 2.7.8+(<a href="https://github.com/kubernetes-sigs/kubespray/issues/4778">not 2.8.x</a>)</li>
+<li>Jinja 2.9+</li>
+</ul>
+
+<h3 id="node-네트워킹-요구사항">Node 네트워킹 요구사항</h3>
+
+<ul>
+<li>Docker 이미지들을 download하고 소프트웨어들을 설치할 수 있도록 인터넷 접속을 허용해줍니다.</li>
+<li>IPv4 Forwarding 활성화합니다.</li>
+<li>배포 중에 문제가 발생하는 것을 방지하기 위해 방화벽을 비활성화합니다.</li>
+</ul>
+
+<h2 id="node-준비">Node 준비</h2>
+
+<p>다음 내용들을 모든 node들에서 수행합니다.</p>
+
+<h3 id="python-설치">Python 설치</h3>
+
+<p>Ansible이 작업을 수행하는 모든 서버는 python이 설치되어져 있어야 합니다. Ubuntu 18.04에서는 기본적으로 Python3이 설치되어져 있으므로 symbolic link를 만들어 줍니다.</p>
+
+<pre><code class="language-shell">sudo ln -s /usr/bin/python3 /usr/bin/python
+</code></pre>
+
+<h3 id="swap-비활성화">Swap 비활성화</h3>
+
+<pre><code class="language-shell">sudo swapoff -a
+sudo sed -i '/ swap /d' /etc/fstab
+</code></pre>
+
+<h3 id="key-기반-인증을-사용할-수-있도록-ssh-구성">key 기반 인증을 사용할 수 있도록 SSH 구성</h3>
+
+<p>Ansible을 실행하려는 서버에서 다음 명령어를 실행하여 RSA key pair를 생성합니다.</p>
+
+<pre><code class="language-shell">ssh-keygen -t rsa
+</code></pre>
+
+<p>public key를 모든 노드에 복사합니다.</p>
+
+<pre><code class="language-shell">ssh-copy-id ubuntu@&lt;node-ip-address&gt;
+</code></pre>
+
+<h3 id="ansible-제어-서버-구성">Ansible 제어 서버 구성</h3>
+
+<h4 id="kubespray-구성">kubespray 구성</h4>
+
+<p><a href="https://github.com/kubernetes-incubator/kubespray.git">공식 레포지토리</a>를 복제합니다.</p>
+
+<pre><code class="language-shell">git clone https://github.com/kubernetes-incubator/kubespray.git
+cd kubespray
+</code></pre>
+
+<p><code>requirements.txt</code>으로 의존성 패키지들을 설치합니다.</p>
+
+<pre><code class="language-shell">sudo pip install -r requirements.txt
+</code></pre>
+
+<h4 id="ansible을-실행할-유저-설정">Ansible을 실행할 유저 설정</h4>
+
+<p><code>ansible.cfg</code> 파일에서 다음 코드를 추가합니다.</p>
+
+<pre><code class="language-shell">vim ansible.cfg
+...
+[defaults]
+...
+remote_user=ubuntu
+</code></pre>
+
+<h4 id="inventory-생성">Inventory 생성</h4>
+
+<pre><code class="language-shell">cp -rfp inventory/sample inventory/prod
+</code></pre>
+
+<p>sample inventory를 prod로 복사합니다. 이는 임의의 이름으로 설치하려는 클러스터에 맞게 정하시면 됩니다.</p>
+
+<p>inventory generator를 사용하여 Inventory를 생성합니다.</p>
+
+<pre><code class="language-shell">declare -a IPS=(10.211.55.42 10.211.55.43 10.211.55.44 10.211.55.45 10.211.55.46)
+CONFIG_FILE=inventory/prod/hosts.yml python3 contrib/inventory_builder/inventory.py ${IPS[@]}
+</code></pre>
+
+<p>실행한 후에는 다음과 같이 인벤토리가 생성된 것을 확인하실 수 있습니다.</p>
+
+<pre><code class="language-yaml">all:
+  hosts:
+    node1:
+      ansible_host: 10.211.55.42
+      ip: 10.211.55.42
+      access_ip: 10.211.55.42
+    node2:
+      ansible_host: 10.211.55.43
+      ip: 10.211.55.43
+      access_ip: 10.211.55.43
+    node3:
+      ansible_host: 10.211.55.44
+      ip: 10.211.55.44
+      access_ip: 10.211.55.44
+    node4:
+      ansible_host: 10.211.55.45
+      ip: 10.211.55.45
+      access_ip: 10.211.55.45
+    node5:
+      ansible_host: 10.211.55.46
+      ip: 10.211.55.46
+      access_ip: 10.211.55.46
+  children:
+    kube-master:
+      hosts:
+        node1:
+        node2:
+    kube-node:
+      hosts:
+        node1:
+        node2:
+        node3:
+        node4:
+        node5:
+    etcd:
+      hosts:
+        node1:
+        node2:
+        node3:
+    k8s-cluster:
+      children:
+        kube-master:
+        kube-node:
+    calico-rr:
+      hosts: {}
+</code></pre>
+
+<h3 id="kubernetes-node-tuning과-kubernetes-master들의-ha를-위한-haproxy-설치">Kubernetes node tuning과 Kubernetes master들의 HA를 위한 haproxy 설치</h3>
+
+<p>Kubernetes node tuning을 위한 Ansible role을 다운로드 합니다.</p>
+
+<pre><code class="language-shell">cd roles/
+git clone https://github.com/lapee79/ansible-role-ubuntu-tuning-for-k8s.git
+mv ansible-role-ubuntu-tuning-for-k8s ubuntu-tuning-for-k8s
+cd ..
+</code></pre>
+
+<p>tuning을 위한 playbook을 생성합니다.</p>
+
+<pre><code class="language-shell">cat &lt;&lt; EOF | tee nodes-tuning.yml
+---
+- hosts: all
+  become: true
+  roles:
+    - name: ubuntu-tuning-for-k8s
+      tags:
+      - ubuntu
+      - kubernetes
+EOF
+</code></pre>
+
+<p>nodes-tuning playbook을 수행합니다.</p>
+
+<pre><code class="language-shell">ansible-playbook -i inventory/prod/hosts.yml nodes-tuning.yml
+</code></pre>
+
+<p>Kubernetes mastser들을 HA 구성하기 위한 haproxy Ansible role을 다운로드합니다.</p>
+
+<pre><code class="language-shell">cd roles/
+git clone https://github.com/lapee79/ansible-role-haproxy-for-k8s-masters.git
+mv ansible-role-haproxy-for-k8s-masters haproxy-for-k8s-masters
+</code></pre>
+
+<p>inventory 디렉토리 내의 <code>group_vars/all/all.yml</code> 파일에서 haproxy에서 사용할 IP 주소와 port를 설정합니다.</p>
+
+<pre><code class="language-shell">cd ..
+vim inventory/prod/group_vars/all/all.yml
+...
+## External LB example config
+## apiserver_loadbalancer_domain_name: &quot;elb.some.domain&quot;
+apiserver_loadbalancer_domain_name: &quot;10.211.55.101&quot;
+loadbalancer_apiserver:
+  address: 10.211.55.101
+  port: 443
+</code></pre>
+
+<p>haproxy 설정값들을 포함하도록 inventory 파일을 수정합니다.</p>
+
+<pre><code class="language-yaml">all:
+  hosts:
+    k8s-master-01:
+      ansible_host: 10.211.55.42
+      ip: 10.211.55.42
+      access_ip: 10.211.55.42
+    k8s-master-02:
+      ansible_host: 10.211.55.43
+      ip: 10.211.55.43
+      access_ip: 10.211.55.43
+    k8s-master-03:
+      ansible_host: 10.211.55.44
+      ip: 10.211.55.44
+      access_ip: 10.211.55.44
+    k8s-worker-01:
+      ansible_host: 10.211.55.45
+      ip: 10.211.55.45
+      access_ip: 10.211.55.45
+    k8s-worker-02:
+      ansible_host: 10.211.55.46
+      ip: 10.211.55.46
+      access_ip: 10.211.55.46
+  children:
+    kube-master:
+      hosts:
+        k8s-master-01:
+          vrrp_instance_state: MASTER
+          vrrp_instance_priority: 101
+        k8s-master-02:
+          vrrp_instance_state: BACKUP
+          vrrp_instance_priority: 100
+        k8s-master-03:
+          vrrp_instance_state: BACKUP
+          vrrp_instance_priority: 99
+      vars:
+        vrrp_interface: enp0s5
+        vrrp_instance_virtual_router_id: 51
+    kube-node:
+      hosts:
+        k8s-worker-01:
+        k8s-worker-02:
+    etcd:
+      hosts:
+        k8s-master-01:
+        k8s-master-02:
+        k8s-master-03:
+    k8s-cluster:
+      children:
+        kube-master:
+        kube-node:
+    calico-rr:
+      hosts: {}
+</code></pre>
+
+<p>Kubernetes master들에 haproxy를 설치하도록 playbook을 작성합니다..</p>
+
+<pre><code class="language-shell">cat &lt;&lt; EOF | tee setup-haproxy-for-k8s-masters.yml
+---
+- hosts: kube-master
+  become: true
+  roles:
+    - name: haproxy-for-k8s-masters
+      tags:
+      - haproxy
+      - keepalived
+      - kubernetes
+EOF
+</code></pre>
+
+<p><code>setup-haproxy-for-k8s-masters</code> playbook을 수행합니다.</p>
+
+<pre><code class="language-shell">cd ../../..
+ansible-playbook -i inventory/prod/hosts.yml setup-haproxy-for-k8s-masters.yml
+</code></pre>
+
+<h3 id="kubernetes-cluster-설정-변경">Kubernetes cluster 설정 변경</h3>
+
+<p>inventory 디렉토리 아래의 group_vars 내에는 config 파일들이 있습니다. 이 파일들을 수정하여 설정들을 변경할 수 있습니다.</p>
+
+<pre><code class="language-shell">vim inventory/prod/group_vars/k8s-cluster/k8s-cluster.yml
+...
+# Choose network plugin (cilium, calico, contiv, weave or flannel. Use cni for generic cni plugin)
+# Can also be set to 'cloud', which lets the cloud provider setup appropriate routing
+kube_network_plugin: calico
+...
+# configure arp_ignore and arp_announce to avoid answering ARP queries from kube-ipvs0 interface
+# must be set to true for MetalLB to work
+kube_proxy_strict_arp: true
+...
+# Make a copy of kubeconfig on the host that runs Ansible in {{ inventory_dir }}/artifacts
+kubeconfig_localhost: true
+# Download kubectl onto the host that runs Ansible in {{ bin_dir }}
+# kubectl_localhost: false
+
+vim inventory/prod/group_vars/k8s-cluster/addons.yml
+...
+# Kubernetes dashboard
+# RBAC required. see docs/getting-started.md for access details.
+dashboard_enabled: false
+</code></pre>
+
+<h2 id="kubespray를-이용하여-kubernetes-클러스터-구성">kubespray를 이용하여 Kubernetes 클러스터 구성</h2>
+
+<p>ansible playbook를 수행하여 Kubernetes 클러스터를 구성합니다.</p>
+
+<pre><code class="language-shell">ansible-playbook -i inventory/prod/hosts.yml cluster.yml -b -v \
+  --private-key=~/.ssh/private_key
+</code></pre>
+
+<h3 id="kubernetes-클러스터-검증">Kubernetes 클러스터 검증</h3>
+
+<p>Kubernetes 클러스터 구성이 완료된 후에 다음 명령어를 사용하여 구성된 클러스터를 검증할 수 있습니다.</p>
+
+<pre><code class="language-shell">kubectl --kubeconfig=inventory/prod/artifacts/admin.conf cluster-info
+kubectl --kubeconfig=inventory/prod/artifacts/admin.conf get nodes
+</code></pre>
+
+<h2 id="kubernetes-클러스터-확장-축소">Kubernetes 클러스터 확장/축소</h2>
+
+<h3 id="node-추가">node 추가</h3>
+
+<ul>
+<li>inventory에 node host를 추가한 후에 kube-node 그룹에도 추가해줍니다.</li>
+<li><code>cluster.yml</code>대신에 <code>scale.yml</code> playbook을 이용하여 ansible-playbook을 수행합니다.</li>
+</ul>
+
+<pre><code class="language-shell">ansible-playbook -i inventory/prod/hosts.yml scale.yml -b -v \
+  --private-key=~/.ssh/private_key
+</code></pre>
+
+<h3 id="node-제거">node 제거</h3>
+
+<p><code>remove-node.yml</code> playbook을 재수행하여 클러스터에서 <strong>master</strong>, <strong>worker</strong>, <strong>etcd</strong> node를 제거할 수 있습니다. 먼저 지정된 node들이 drain된 다음 Kubernetes 서비스들을 정지하고 certificate들을 삭제한 후에 마지막으로 이 node들을 삭제하는 kubectl 명령을 수행합니다. 이는 node 추가와 결합될 수 있습니다.</p>
+
+<p>제거하려는 node들은 <code>--extra-vars &quot;node=,&quot;</code>으로 값을 전달합니다.</p>
+
+<pre><code class="language-shell">ansible-playbook -i inventory/prod/hosts.yml remove-node.yml -b -v \
+--private-key=~/.ssh/private_key \
+--extra-vars &quot;node=nodename,nodename2&quot;
+</code></pre>
+
+<h2 id="kubernetes-업그레이드">Kubernetes 업그레이드</h2>
+
+<blockquote>
+<p>주의</p>
+
+<p>만약 기존에 deprecated API object들로 배포환경이 구축되어져 있고 Kubernetes 1.16 버젼 이상으로 업그레이드를 한다고 했을 때, 다음 설정을 통해 기존 object들을 유지할 수 있습니다.</p>
+
+<p><a href="https://kubernetes.io/blog/2019/07/18/api-deprecations-in-1-16/">https://kubernetes.io/blog/2019/07/18/api-deprecations-in-1-16/</a></p>
+</blockquote>
+
+<pre><code class="language-shell">vim roles/kubernetes/node/defaults/main.yaml
+...
+# deprecated runtime을 활성화하려면 다음 section의 주석을 해제합니다.
+kube_api_runtime_config:
+  - apps/v1beta1=true
+  - apps/v1beta2=true
+  - extensions/v1beta1/daemonsets=true
+  - extensions/v1beta1/deployments=true
+  - extensions/v1beta1/replicasets=true
+  - extensions/v1beta1/networkpolicies=true
+  - extensions/v1beta1/podsecuritypolicies=true
+</code></pre>
+
+<h3 id="rolling-업그레이드">Rolling 업그레이드</h3>
+
+<p>클러스터 업그레이드를 수행할 때, Kubespray는 node들에 cordon, drain, uncordon을 지원합니다. 업그레이드만을 지원하기 위한 별도의 <code>upgrade-cluster.yml</code> playbook이 존재합니다. 이는 기존에 최소 1대 이상의 kube-master가 반드시 존재해야 한다는 것을 의미합니다.</p>
+
+<pre><code class="language-shell">ansible-playbook upgrade-cluster.yml -b -i inventory/prod/hosts.yml -e kube_version=v1.16.3
+</code></pre>
+
+<p>업그레이드가 성공했다면 Server Version이 업그레이드 된 것을 확인하실 수 있습니다.</p>
+
+<pre><code class="language-shell">kubectl version
+Client Version: version.Info{Major:&quot;1&quot;, Minor:&quot;16&quot;, GitVersion:&quot;v1.16.2&quot;, GitCommit:&quot;c97fe5036ef3df2967d086711e6c0c405941e14b&quot;, GitTreeState:&quot;clean&quot;, BuildDate:&quot;2019-10-15T23:42:50Z&quot;, GoVersion:&quot;go1.12.10&quot;, Compiler:&quot;gc&quot;, Platform:&quot;darwin/amd64&quot;}
+Server Version: version.Info{Major:&quot;1&quot;, Minor:&quot;16&quot;, GitVersion:&quot;v1.16.3&quot;, GitCommit:&quot;b3cbbae08ec52a7fc73d334838e18d17e8512749&quot;, GitTreeState:&quot;clean&quot;, BuildDate:&quot;2019-11-13T11:13:49Z&quot;, GoVersion:&quot;go1.12.12&quot;, Compiler:&quot;gc&quot;, Platform:&quot;linux/amd64&quot;}
+</code></pre>
+
+<h2 id="related-links">Related links</h2>
+
+<ul>
+<li><a href="https://kubernetes.io/docs/setup/production-environment/tools/kubespray/">https://kubernetes.io/docs/setup/production-environment/tools/kubespray/</a></li>
+<li><a href="https://kubespray.io">https://kubespray.io</a></li>
+<li><a href="https://github.com/kubernetes-sigs/kubespray">https://github.com/kubernetes-sigs/kubespray</a></li>
+<li><a href="https://github.com/lapee79/ansible-role-ubuntu-tuning-for-k8s">https://github.com/lapee79/ansible-role-ubuntu-tuning-for-k8s</a></li>
+<li><a href="https://github.com/lapee79/ansible-role-haproxy-for-k8s-masters">https://github.com/lapee79/ansible-role-haproxy-for-k8s-masters</a></li>
+</ul>
+
+    
+</div>
+
+    
+<div class="footer">
+
+
+    
+        <div class="tags">
+            <i class="fa fa-tags"></i>
+            <div class="links">
+                
+                    <a href="/tags/kubernetes">Kubernetes</a>
+                
+                    <a href="/tags/baremetal">Baremetal</a>
+                
+                    <a href="/tags/kubespray">kubespray</a>
+                
+                    <a href="/tags/production">Production</a>
+                
+            </div>
+        </div>
+    
+
+    
+    <div class="languages">
+        <i class="fa fa-language"></i>
+        <div class="links">
+            
+                <a href="https://lapee79.github.io/en/article/setup-production-ready-kubernetes-on-baremetal-with-kubespray/">en</a>
+            
+        </div>
+    </div>
+    
+</div>
+
+</article>
+
+        
+    </div>
+
+    
+        <div id="disqus_thread"></div>
+<script type="application/javascript">
+    var disqus_config = function () {
+    
+    
+    
+    };
+    (function() {
+        if (["localhost", "127.0.0.1"].indexOf(window.location.hostname) != -1) {
+            document.getElementById('disqus_thread').innerHTML = 'Disqus comments not available by default when the website is previewed locally.';
+            return;
+        }
+        var d = document, s = d.createElement('script'); s.async = true;
+        s.src = '//' + "lapee79s-tech-blog" + '.disqus.com/embed.js';
+        s.setAttribute('data-timestamp', +new Date());
+        (d.head || d.body).appendChild(s);
+    })();
+</script>
+<noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+<a href="https://disqus.com" class="dsq-brlink">comments powered by <span class="logo-disqus">Disqus</span></a>
+    
+
+     
+
+        </div>
+
+        
+<footer>
+    <div class="container">
+
+        
+        <div class="recent-posts">
+            <strong>최근 글</strong>
+                <ul>
+                
+                    <li>
+                        <a href="/article/use-a-local-disk-by-local-volume-static-provisioner-in-kubernetes/">Kubernetes에서 Local Persistent Volume을 사용하여 local disk 사용</a>
+                    </li>
+                
+                    <li>
+                        <a href="/article/setup-production-ready-kubernetes-on-baremetal-with-kubespray/">Bare Metal 서버에 kubespray를 이용하여 Production 환경의 Kubernetes 클러스터 구축</a>
+                    </li>
+                
+                    <li>
+                        <a href="/article/monitoring-http-using-blackbox-exporter/">Blackbox exporter를 이용한 HTTP 모니터링</a>
+                    </li>
+                
+                    <li>
+                        <a href="/article/loki-kubernetes-logging/">Loki - Kubernetes 로깅</a>
+                    </li>
+                
+                    <li>
+                        <a href="/article/setup-a-production-ready-istio/">Setup a production-ready Istio</a>
+                    </li>
+                
+                    <li>
+                        <a href="/article/prometheus-alertmanager-with-msteams/">Alertmanager로 Prometheus의 알람을 Microsoft Teams에 발송하기</a>
+                    </li>
+                
+                    <li>
+                        <a href="/article/hosting-website-from-githubpages/">GitHub Pages에서 웹사이트 호스팅하기</a>
+                    </li>
+                
+                </ul>
+        </div>
+        
+
+        
+        <div class="categories">
+            <a href="/categories/"><strong>카테고리</strong></a>
+                <ul>
+                
+                    <li>
+                        <a href="/categories/tutorials">Tutorials (4)</a>
+                    </li>
+                
+                    <li>
+                        <a href="/categories/kubernetes">Kubernetes (3)</a>
+                    </li>
+                
+                    <li>
+                        <a href="/categories/devops">Devops (2)</a>
+                    </li>
+                
+                    <li>
+                        <a href="/categories/monitoring">Monitoring (2)</a>
+                    </li>
+                
+                    <li>
+                        <a href="/categories/prometheus">Prometheus (2)</a>
+                    </li>
+                
+                    <li>
+                        <a href="/categories/alertmanager">Alertmanager (1)</a>
+                    </li>
+                
+                    <li>
+                        <a href="/categories/exporter">Exporter (1)</a>
+                    </li>
+                
+                    <li>
+                        <a href="/categories/github-pages">Github pages (1)</a>
+                    </li>
+                
+                    <li>
+                        <a href="/categories/grafana">Grafana (1)</a>
+                    </li>
+                
+                    <li>
+                        <a href="/categories/istio">Istio (1)</a>
+                    </li>
+                
+                    <li>
+                        <a href="/categories/loki">Loki (1)</a>
+                    </li>
+                
+                    <li>
+                        <a href="/categories/service-mesh">Service mesh (1)</a>
+                    </li>
+                
+            </ul>
+        </div>
+        
+
+        <div class="right">
+            
+            <div class="external-profiles">
+                <strong>소셜 미디어</strong>
+
+                
+                
+                
+                
+                
+                
+                
+                
+                
+                
+                    <a href="https://github.com/lapee79" target="_blank"><i class="fa fa-github"></i></a>
+                
+                
+            </div>
+            
+
+            
+        </div>
+    </div>
+</footer>
+
+
+<div class="credits">
+    <div class="container">
+        <div class="copyright">
+            <a href="https://github.com/lapee79" target="_blank">
+                &copy;
+                
+                    2020
+                
+                by lapee79
+            </a>
+	    
+        </div>
+        <div class="author">
+            <a href="https://github.com/Lednerb/bilberry-hugo-theme" target="_blank">Bilberry Hugo Theme</a>
+        </div>
+    </div>
+</div>
+
+
+        
+<script type="application/javascript">
+var doNotTrack = false;
+if (!doNotTrack) {
+	window.ga=window.ga||function(){(ga.q=ga.q||[]).push(arguments)};ga.l=+new Date;
+	ga('create', 'UA-148360124-1', 'auto');
+	
+	ga('send', 'pageview');
+}
+</script>
+<script async src='https://www.google-analytics.com/analytics.js'></script>
+
+
+        
+
+        
+        
+        <script type="text/javascript" src="https://lapee79.github.io/js/externalDependencies.39c47e10e241eae2947b3fe21809c572.js" integrity="md5-OcR&#43;EOJB6uKUez/iGAnFcg=="></script>
+
+        
+        
+        <script type="text/javascript" src="https://lapee79.github.io/js/theme.ff50ae6dc1bfc220b23bf69dbb41b54e.js" integrity="md5-/1CubcG/wiCyO/adu0G1Tg=="></script>
+
+        <script>
+            $(".moment").each(function() {
+                $(this).text(
+                    moment( $(this).text() )
+                        .locale( "ko" )
+                        .format('LL')
+                );
+            });
+
+            $(".footnote-return sup").html("");
+        </script>
+
+        
+            
+        
+
+        
+            <script>
+    var client = algoliasearch("1RS3EVEBZI", "287247fefbadb3e2e5e0960034440842");
+    var index = client.initIndex("lapee79-tech-blog");
+
+    $('#search').autocomplete({ hint: false, autoselect: true, debug: false },
+      [
+        {
+          
+            source: $.fn.autocomplete.sources.hits(index, { hitsPerPage: 10 }),
+          
+          displayKey: function(suggestion) {
+            return suggestion.title || suggestion.author
+          },
+          templates: {
+            suggestion: function(suggestion) {
+                return "<span class='entry " + suggestion.type + "'>"
+                      + "<span class='title'>" + suggestion.title + "</span>"
+                      + "<span class='fa fa-fw " + suggestion.iconClass + "'></span>"
+                  + "</span>"
+                ;
+            },
+            empty: function() {
+              return "<span class='empty'>검색 결과가 없습니다.</span>"
+            },
+            footer: function() {
+              return '<div class="branding">Powered by <img src="https:\/\/lapee79.github.io\/dist\/algolia-logo-light.svg" /></div>'
+            }
+
+          },
+        }
+      ])
+      .on('autocomplete:selected', function(event, suggestion, dataset) {
+        window.location = (suggestion.url);
+      })
+      .keypress(function (event, suggestion) {
+        if (event.which == 13) {
+          window.location = (suggestion.url);
+        }
+      });
+</script>
+
+        
+
+
+    </body>
+</html>

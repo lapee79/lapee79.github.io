@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Kubespray on lapee79&#39;s Tech Blog</title>
+    <link>https://lapee79.github.io/en/tags/kubespray/</link>
+    <description>Recent content in Kubespray on lapee79&#39;s Tech Blog</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <lastBuildDate>Mon, 23 Dec 2019 10:00:00 +0000</lastBuildDate>
+    
+	<atom:link href="https://lapee79.github.io/en/tags/kubespray/index.xml" rel="self" type="application/rss+xml" />
+    
+    
+    <item>
+      <title>Setup Production Ready Kubernetes on baremetal with kubespray</title>
+      <link>https://lapee79.github.io/en/article/setup-production-ready-kubernetes-on-baremetal-with-kubespray/</link>
+      <pubDate>Mon, 23 Dec 2019 10:00:00 +0000</pubDate>
+      
+      <guid>https://lapee79.github.io/en/article/setup-production-ready-kubernetes-on-baremetal-with-kubespray/</guid>
+      <description>Kubespray is a composition of Ansible playbooks, inventory, provisioning tools, and domain knowledge for generic OS/Kubernetes clusters configuration management tasks.
+Prerequisites Hardware  5 Nodes: Virtual/Physical Machines Memory: 8GB
+ CPU: 4Core
+ Hard disk: 120GB available
+  Software Kubernetes nodes
+ Ubuntu 18.04 Python SSH Server Privileged user  Kubespray machine
+ Ansible 2.7.8+(not 2.8.x) Jinja 2.9+  Nodes Networking requisites  Internet access to download docker images and install softwares IPv4 Forwarding should be enabled In order to avoid any issue during deployment, you should disable firewall.</description>
+    </item>
+    
+  </channel>
+</rss>

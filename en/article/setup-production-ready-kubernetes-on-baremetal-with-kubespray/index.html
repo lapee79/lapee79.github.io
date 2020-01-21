@@ -1,0 +1,822 @@
+<!doctype html>
+<html class="no-js" lang="en">
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="author" content="lapee79">
+        <meta name="description" content="lapee79&#39;s IT Tech Blog.">
+        <meta name="keywords" content="blog,personal,posts,it,korean">
+        <meta name="generator" content="Hugo 0.53" />
+        <title> Setup Production Ready Kubernetes on baremetal with kubespray | lapee79&#39;s Tech Blog</title>
+        <meta name="description" content="Setup Production Ready Kubernetes on baremetal with kubespray - lapee79&#39;s IT Tech Blog.">
+        <meta itemprop="name" content="Setup Production Ready Kubernetes on baremetal with kubespray">
+        <meta itemprop="description" content="Setup Production Ready Kubernetes on baremetal with kubespray - lapee79&#39;s IT Tech Blog.">
+        <meta property="og:title" content="Setup Production Ready Kubernetes on baremetal with kubespray">
+        <meta property="og:description" content="Setup Production Ready Kubernetes on baremetal with kubespray - lapee79&#39;s IT Tech Blog.">
+        <meta property="og:image" content="https://www.gravatar.com/avatar/4068068eb59505ffebdc556d0aa2c9c9?size=200">
+        <meta property="og:url" content="https://lapee79.github.io/en/article/setup-production-ready-kubernetes-on-baremetal-with-kubespray/">
+        <meta property="og:site_name" content="lapee79&#39;s Tech Blog">
+        <meta property="og:type" content="article">
+        <link rel="icon" type="image/png" href="https://lapee79.github.io/favicon-32x32.png" sizes="32x32">
+        <link rel="icon" type="image/png" href="https://lapee79.github.io/favicon-16x16.png" sizes="16x16">
+
+	
+
+        
+        
+        
+        
+        <link rel="stylesheet" href="https://lapee79.github.io/sass/combined.min.c7b63af25d73ccc22a82ec5d3a6dfccaf77ecee67014e5cc71dd9d8eafec0d4e.css">
+
+        
+
+        
+            
+        
+    </head>
+    <body class="bilberry-hugo-theme">
+        
+<nav class="permanentTopNav">
+
+    <div class="container">
+        <ul class="topnav">
+            
+        </ul>
+
+        
+            <div id="search-box" class="search">
+                <i class="fa fa-search"></i>
+                <input id="search" type="text" placeholder="Search ...">
+            </div>
+        
+    </div>
+</nav>
+
+
+        <header>
+    <div class="container">
+        <div class="logo">
+            <a href="/en" class="logo">
+                
+                    <img src="https://www.gravatar.com/avatar/4068068eb59505ffebdc556d0aa2c9c9?d=mm&size=200" alt="">
+                
+
+                <span class="overlay"><i class="fa fa-home"></i></span>
+            </a>
+        </div>
+        <div class="titles">
+            <h3 class="title"><a href="/en">lapee79&#39;s Tech Blog</a></h3>
+            
+                <span class="subtitle">lapee79의 기술 지식 창고.</span>
+            
+        </div>
+
+    
+
+        
+        <div class="toggler permanentTopNav">
+        
+            <i class="fa fa-bars" aria-hidden="true"></i>
+        </div>
+    </div>
+    <script data-ad-client="ca-pub-6723773787660575" async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
+</header>
+
+
+        <div class="main container">
+            
+     
+    <div class="article-wrapper u-cf single">
+        
+            <a class="bubble" href="/en/article/setup-production-ready-kubernetes-on-baremetal-with-kubespray/">
+    <i class="fa fa-fw fa-pencil"></i>
+</a>
+
+<article class="default article">
+    
+    <div class="featured-image">
+        <a href="/en/article/setup-production-ready-kubernetes-on-baremetal-with-kubespray/">
+            
+                <img src="/en/article/setup-production-ready-kubernetes-on-baremetal-with-kubespray/featuredImage_hu3bced1e920add2777bea4e2136b2d62b_53357_700x350_fill_q95_box_smart1_2.png" alt="">
+            
+        </a>
+    </div>
+
+
+    <div class="content">
+    <h3><a href="/en/article/setup-production-ready-kubernetes-on-baremetal-with-kubespray/">Setup Production Ready Kubernetes on baremetal with kubespray</a></h3>
+    <div class="meta">
+        
+            
+                <span class="date moment">2019-12-23</span>
+            
+        
+
+        
+
+        
+            <span class="categories">
+                
+                    <a href="/en/categories/kubernetes">Kubernetes</a>
+                
+                    <a href="/en/categories/devops">DevOps</a>
+                
+            </span>
+        
+
+        
+            <span class="author"><a href="/en/author/lapee79">lapee79</a></span>
+        
+    </div>
+
+    
+        
+
+<p><a href="https://kubespray.io">Kubespray</a> is a composition of <a href="https://docs.ansible.com/">Ansible</a> playbooks, inventory, provisioning tools, and domain knowledge for generic OS/Kubernetes clusters configuration management tasks.</p>
+
+<h2 id="prerequisites">Prerequisites</h2>
+
+<h3 id="hardware">Hardware</h3>
+
+<ul>
+<li>5 Nodes: Virtual/Physical Machines</li>
+
+<li><p>Memory: 8GB</p></li>
+
+<li><p>CPU: 4Core</p></li>
+
+<li><p>Hard disk: 120GB available</p></li>
+</ul>
+
+<h3 id="software">Software</h3>
+
+<p><code>Kubernetes nodes</code></p>
+
+<ul>
+<li>Ubuntu 18.04</li>
+<li>Python</li>
+<li>SSH Server</li>
+<li>Privileged user</li>
+</ul>
+
+<p><code>Kubespray machine</code></p>
+
+<ul>
+<li>Ansible 2.7.8+(<a href="https://github.com/kubernetes-sigs/kubespray/issues/4778">not 2.8.x</a>)</li>
+<li>Jinja 2.9+</li>
+</ul>
+
+<h3 id="nodes-networking-requisites">Nodes Networking requisites</h3>
+
+<ul>
+<li>Internet access to download docker images and install softwares</li>
+<li>IPv4 Forwarding should be enabled</li>
+<li>In order to avoid any issue during deployment, you should disable firewall.</li>
+</ul>
+
+<h2 id="preparing-the-nodes">Preparing the nodes</h2>
+
+<p>Run follow instructions on all nodes.</p>
+
+<h3 id="install-python">Install Python</h3>
+
+<p>Ansible needs python to be installed on all the machines. Ubuntu 18.04 already has Python3. So you need to create symbolic link.</p>
+
+<pre><code class="language-shell">sudo ln -s /usr/bin/python3 /usr/bin/python
+</code></pre>
+
+<h3 id="disable-swap">Disable Swap</h3>
+
+<pre><code class="language-shell">sudo swapoff -a
+sudo sed -i '/ swap /d' /etc/fstab
+</code></pre>
+
+<h3 id="setup-ssh-using-key-based-authentication">Setup SSH using key-based authentication</h3>
+
+<p>Generate an RSA key pair by execute this command on the Ansible controller machine.</p>
+
+<pre><code class="language-shell">ssh-keygen -t rsa
+</code></pre>
+
+<p>Copy over the public key to all nodes.</p>
+
+<pre><code class="language-shell">ssh-copy-id ubuntu@&lt;node-ip-address&gt;
+</code></pre>
+
+<h3 id="setup-ansible-controller-machine">Setup Ansible Controller machine</h3>
+
+<h4 id="setup-kubespray">Setup kubespray</h4>
+
+<p>Clone the <a href="https://github.com/kubernetes-incubator/kubespray.git">official repository</a>.</p>
+
+<pre><code class="language-shell">git clone https://github.com/kubernetes-incubator/kubespray.git
+cd kubespray
+</code></pre>
+
+<p>Install dependencies from <code>requirements.txt</code></p>
+
+<pre><code class="language-shell">sudo pip install -r requirements.txt
+</code></pre>
+
+<h4 id="set-remote-user-for-ansible">Set Remote User for Ansible</h4>
+
+<p>Add the following section in <code>ansible.cfg</code> file.</p>
+
+<pre><code class="language-shell">vim ansible.cfg
+...
+[defaults]
+...
+remote_user=ubuntu
+</code></pre>
+
+<h4 id="create-inventory">Create Inventory</h4>
+
+<pre><code class="language-shell">cp -rfp inventory/sample inventory/prod
+</code></pre>
+
+<p>where prod is the custom configuration name. Replace with whatever name you would like to assign to the current cluster.</p>
+
+<p>Create inventory using inventory generator.</p>
+
+<pre><code class="language-shell">declare -a IPS=(10.211.55.42 10.211.55.43 10.211.55.44 10.211.55.45 10.211.55.46)
+CONFIG_FILE=inventory/prod/hosts.yml python3 contrib/inventory_builder/inventory.py ${IPS[@]}
+</code></pre>
+
+<p>Once it run, you can see an inventory file that looks like below:</p>
+
+<pre><code class="language-yaml">all:
+  hosts:
+    node1:
+      ansible_host: 10.211.55.42
+      ip: 10.211.55.42
+      access_ip: 10.211.55.42
+    node2:
+      ansible_host: 10.211.55.43
+      ip: 10.211.55.43
+      access_ip: 10.211.55.43
+    node3:
+      ansible_host: 10.211.55.44
+      ip: 10.211.55.44
+      access_ip: 10.211.55.44
+    node4:
+      ansible_host: 10.211.55.45
+      ip: 10.211.55.45
+      access_ip: 10.211.55.45
+    node5:
+      ansible_host: 10.211.55.46
+      ip: 10.211.55.46
+      access_ip: 10.211.55.46
+  children:
+    kube-master:
+      hosts:
+        node1:
+        node2:
+    kube-node:
+      hosts:
+        node1:
+        node2:
+        node3:
+        node4:
+        node5:
+    etcd:
+      hosts:
+        node1:
+        node2:
+        node3:
+    k8s-cluster:
+      children:
+        kube-master:
+        kube-node:
+    calico-rr:
+      hosts: {}
+</code></pre>
+
+<h3 id="tuning-kubernetes-nodes-and-setup-haproxy-for-kubernetes-masters">Tuning Kubernetes nodes and setup haproxy for Kubernetes masters</h3>
+
+<p>Download the role for tuning Kubernetes node.</p>
+
+<pre><code class="language-shell">cd roles/
+git clone https://github.com/lapee79/ansible-role-ubuntu-tuning-for-k8s.git
+mv ansible-role-ubuntu-tuning-for-k8s ubuntu-tuning-for-k8s
+cd ..
+</code></pre>
+
+<p>Create a playbook for tuning.</p>
+
+<pre><code class="language-shell">cat &lt;&lt; EOF | tee nodes-tuning.yml
+---
+- hosts: all
+  become: true
+  roles:
+    - name: ubuntu-tuning-for-k8s
+      tags:
+      - ubuntu
+      - kubernetes
+EOF
+</code></pre>
+
+<p>Run nodes-tuning playbook</p>
+
+<pre><code class="language-shell">ansible-playbook -i inventory/prod/hosts.yml nodes-tuning.yml
+</code></pre>
+
+<p>Download the role for setup haproxy to Kubernetes mastsers</p>
+
+<pre><code class="language-shell">cd roles/
+git clone https://github.com/lapee79/ansible-role-haproxy-for-k8s-masters.git
+mv ansible-role-haproxy-for-k8s-masters haproxy-for-k8s-masters
+</code></pre>
+
+<p>Set the IP address and port for haproxy in <code>group_vars/all/all.yml</code> in inventory directory.</p>
+
+<pre><code class="language-shell">cd ..
+vim inventory/prod/group_vars/all/all.yml
+...
+## External LB example config
+## apiserver_loadbalancer_domain_name: &quot;elb.some.domain&quot;
+apiserver_loadbalancer_domain_name: &quot;10.211.55.101&quot;
+loadbalancer_apiserver:
+  address: 10.211.55.101
+  port: 443
+</code></pre>
+
+<p>Edit the inventory file to configure haproxy</p>
+
+<pre><code class="language-yaml">all:
+  hosts:
+    k8s-master-01:
+      ansible_host: 10.211.55.42
+      ip: 10.211.55.42
+      access_ip: 10.211.55.42
+    k8s-master-02:
+      ansible_host: 10.211.55.43
+      ip: 10.211.55.43
+      access_ip: 10.211.55.43
+    k8s-master-03:
+      ansible_host: 10.211.55.44
+      ip: 10.211.55.44
+      access_ip: 10.211.55.44
+    k8s-worker-01:
+      ansible_host: 10.211.55.45
+      ip: 10.211.55.45
+      access_ip: 10.211.55.45
+    k8s-worker-02:
+      ansible_host: 10.211.55.46
+      ip: 10.211.55.46
+      access_ip: 10.211.55.46
+  children:
+    kube-master:
+      hosts:
+        k8s-master-01:
+          vrrp_instance_state: MASTER
+          vrrp_instance_priority: 101
+        k8s-master-02:
+          vrrp_instance_state: BACKUP
+          vrrp_instance_priority: 100
+        k8s-master-03:
+          vrrp_instance_state: BACKUP
+          vrrp_instance_priority: 99
+      vars:
+        vrrp_interface: enp0s5
+        vrrp_instance_virtual_router_id: 51
+    kube-node:
+      hosts:
+        k8s-worker-01:
+        k8s-worker-02:
+    etcd:
+      hosts:
+        k8s-master-01:
+        k8s-master-02:
+        k8s-master-03:
+    k8s-cluster:
+      children:
+        kube-master:
+        kube-node:
+    calico-rr:
+      hosts: {}
+</code></pre>
+
+<p>Create a playbook for Kubernetes masters&rsquo; haproxy.</p>
+
+<pre><code class="language-shell">cat &lt;&lt; EOF | tee setup-haproxy-for-k8s-masters.yml
+---
+- hosts: kube-master
+  become: true
+  roles:
+    - name: haproxy-for-k8s-masters
+      tags:
+      - haproxy
+      - keepalived
+      - kubernetes
+EOF
+</code></pre>
+
+<p>Run <code>setup-haproxy-for-k8s-masters</code> playbook</p>
+
+<pre><code class="language-shell">cd ../../..
+ansible-playbook -i inventory/prod/hosts.yml setup-haproxy-for-k8s-masters.yml
+</code></pre>
+
+<h3 id="customize-kubernetes-cluster-configurations">Customize Kubernetes cluster configurations</h3>
+
+<p>There are config files in your inventory directory&rsquo;s group_vars. You may want to modify some configurations.</p>
+
+<pre><code class="language-shell">vim inventory/prod/group_vars/k8s-cluster/k8s-cluster.yml
+...
+# Choose network plugin (cilium, calico, contiv, weave or flannel. Use cni for generic cni plugin)
+# Can also be set to 'cloud', which lets the cloud provider setup appropriate routing
+kube_network_plugin: calico
+...
+# configure arp_ignore and arp_announce to avoid answering ARP queries from kube-ipvs0 interface
+# must be set to true for MetalLB to work
+kube_proxy_strict_arp: true
+...
+# Make a copy of kubeconfig on the host that runs Ansible in {{ inventory_dir }}/artifacts
+kubeconfig_localhost: true
+# Download kubectl onto the host that runs Ansible in {{ bin_dir }}
+# kubectl_localhost: false
+
+vim inventory/prod/group_vars/k8s-cluster/addons.yml
+...
+# Kubernetes dashboard
+# RBAC required. see docs/getting-started.md for access details.
+dashboard_enabled: false
+</code></pre>
+
+<h2 id="set-up-kubernetes-cluster-with-kubespray">Set up Kubernetes cluster with kubespray</h2>
+
+<p>Run the ansible-playbook to bootstrap your Kubernetes cluster:</p>
+
+<pre><code class="language-shell">ansible-playbook -i inventory/prod/hosts.yml cluster.yml -b -v \
+  --private-key=~/.ssh/private_key
+</code></pre>
+
+<h3 id="verify-kubernetes-cluster">Verify Kubernetes cluster</h3>
+
+<p>You should verify the Kubernetes cluster using these commands.</p>
+
+<pre><code class="language-shell">kubectl --kubeconfig=inventory/prod/artifacts/admin.conf cluster-info
+kubectl --kubeconfig=inventory/prod/artifacts/admin.conf get nodes
+</code></pre>
+
+<h2 id="scale-kubernetes-cluster">Scale Kubernetes cluster</h2>
+
+<h3 id="adding-nodes">Adding nodes</h3>
+
+<ul>
+<li>Add the new worker node to your inventory in the appropriate group</li>
+<li>Run the ansible-playbook command, substituting <code>cluster.yml</code> for <code>scale.yml</code>:</li>
+</ul>
+
+<pre><code class="language-shell">ansible-playbook -i inventory/prod/hosts.yml scale.yml -b -v \
+  --private-key=~/.ssh/private_key
+</code></pre>
+
+<h3 id="remove-nodes">Remove nodes</h3>
+
+<p>You may want to remove <strong>master</strong>, <strong>worker</strong>, or <strong>etcd</strong> nodes from your existing cluster. This can be done by re-running the <code>remove-node.yml</code> playbook. First, all specified nodes will be drained, then stop some kubernetes services and delete some certificates, and finally execute the kubectl command to delete these nodes. This can be combined with the add node function.</p>
+
+<p>Use <code>--extra-vars &quot;node=,&quot;</code> to select the node(s) you want to delete.</p>
+
+<pre><code class="language-shell">ansible-playbook -i inventory/prod/hosts.yml remove-node.yml -b -v \
+--private-key=~/.ssh/private_key \
+--extra-vars &quot;node=nodename,nodename2&quot;
+</code></pre>
+
+<h2 id="upgrading-kubernetes">Upgrading Kubernetes</h2>
+
+<blockquote>
+<p>Note</p>
+
+<p>If you have deprecated API objects and plan to upgrade to newer Kubernetes version than 1.16, you can maintain the APIs.</p>
+
+<p><a href="https://kubernetes.io/blog/2019/07/18/api-deprecations-in-1-16/">https://kubernetes.io/blog/2019/07/18/api-deprecations-in-1-16/</a></p>
+</blockquote>
+
+<pre><code class="language-shell">vim roles/kubernetes/node/defaults/main.yaml
+...
+# Uncomment if you need to enable deprecated runtimes
+kube_api_runtime_config:
+  - apps/v1beta1=true
+  - apps/v1beta2=true
+  - extensions/v1beta1/daemonsets=true
+  - extensions/v1beta1/deployments=true
+  - extensions/v1beta1/replicasets=true
+  - extensions/v1beta1/networkpolicies=true
+  - extensions/v1beta1/podsecuritypolicies=true
+</code></pre>
+
+<h3 id="graceful-upgrade">Graceful upgrade</h3>
+
+<p>Kubespray supports cordon, drain and uncordoning of nodes when performing a cluster upgrade. There is a separate playbook used for this purpose. It is important to note that <code>upgrade-cluster.yml</code> can only be used for upgrading an existing cluster. That means there must be at least 1 kube-master already deployed.</p>
+
+<pre><code class="language-shell">ansible-playbook upgrade-cluster.yml -b -i inventory/prod/hosts.yml -e kube_version=v1.16.3
+</code></pre>
+
+<p>After a successful upgrade, the Server Version should be updated:</p>
+
+<pre><code class="language-shell">kubectl version
+Client Version: version.Info{Major:&quot;1&quot;, Minor:&quot;16&quot;, GitVersion:&quot;v1.16.2&quot;, GitCommit:&quot;c97fe5036ef3df2967d086711e6c0c405941e14b&quot;, GitTreeState:&quot;clean&quot;, BuildDate:&quot;2019-10-15T23:42:50Z&quot;, GoVersion:&quot;go1.12.10&quot;, Compiler:&quot;gc&quot;, Platform:&quot;darwin/amd64&quot;}
+Server Version: version.Info{Major:&quot;1&quot;, Minor:&quot;16&quot;, GitVersion:&quot;v1.16.3&quot;, GitCommit:&quot;b3cbbae08ec52a7fc73d334838e18d17e8512749&quot;, GitTreeState:&quot;clean&quot;, BuildDate:&quot;2019-11-13T11:13:49Z&quot;, GoVersion:&quot;go1.12.12&quot;, Compiler:&quot;gc&quot;, Platform:&quot;linux/amd64&quot;}
+</code></pre>
+
+<h2 id="related-links">Related links</h2>
+
+<ul>
+<li><a href="https://kubernetes.io/docs/setup/production-environment/tools/kubespray/">https://kubernetes.io/docs/setup/production-environment/tools/kubespray/</a></li>
+<li><a href="https://kubespray.io">https://kubespray.io</a></li>
+<li><a href="https://github.com/kubernetes-sigs/kubespray">https://github.com/kubernetes-sigs/kubespray</a></li>
+<li><a href="https://github.com/lapee79/ansible-role-ubuntu-tuning-for-k8s">https://github.com/lapee79/ansible-role-ubuntu-tuning-for-k8s</a></li>
+<li><a href="https://github.com/lapee79/ansible-role-haproxy-for-k8s-masters">https://github.com/lapee79/ansible-role-haproxy-for-k8s-masters</a></li>
+</ul>
+
+    
+</div>
+
+    
+<div class="footer">
+
+
+    
+        <div class="tags">
+            <i class="fa fa-tags"></i>
+            <div class="links">
+                
+                    <a href="/en/tags/kubernetes">Kubernetes</a>
+                
+                    <a href="/en/tags/baremetal">Baremetal</a>
+                
+                    <a href="/en/tags/kubespray">kubespray</a>
+                
+                    <a href="/en/tags/production">Production</a>
+                
+            </div>
+        </div>
+    
+
+    
+    <div class="languages">
+        <i class="fa fa-language"></i>
+        <div class="links">
+            
+                <a href="https://lapee79.github.io/article/setup-production-ready-kubernetes-on-baremetal-with-kubespray/">ko</a>
+            
+        </div>
+    </div>
+    
+</div>
+
+</article>
+
+        
+    </div>
+
+    
+        <div id="disqus_thread"></div>
+<script type="application/javascript">
+    var disqus_config = function () {
+    
+    
+    
+    };
+    (function() {
+        if (["localhost", "127.0.0.1"].indexOf(window.location.hostname) != -1) {
+            document.getElementById('disqus_thread').innerHTML = 'Disqus comments not available by default when the website is previewed locally.';
+            return;
+        }
+        var d = document, s = d.createElement('script'); s.async = true;
+        s.src = '//' + "lapee79s-tech-blog" + '.disqus.com/embed.js';
+        s.setAttribute('data-timestamp', +new Date());
+        (d.head || d.body).appendChild(s);
+    })();
+</script>
+<noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+<a href="https://disqus.com" class="dsq-brlink">comments powered by <span class="logo-disqus">Disqus</span></a>
+    
+
+     
+
+        </div>
+
+        
+<footer>
+    <div class="container">
+
+        
+        <div class="recent-posts">
+            <strong>Latest posts</strong>
+                <ul>
+                
+                    <li>
+                        <a href="/en/article/use-a-local-disk-by-local-volume-static-provisioner-in-kubernetes/">Use a local disk through Local Persistent Volumes in Kubernetes</a>
+                    </li>
+                
+                    <li>
+                        <a href="/en/article/setup-production-ready-kubernetes-on-baremetal-with-kubespray/">Setup Production Ready Kubernetes on baremetal with kubespray</a>
+                    </li>
+                
+                    <li>
+                        <a href="/en/article/monitoring-http-using-blackbox-exporter/">Monitoring HTTP using Blackbox exporter</a>
+                    </li>
+                
+                    <li>
+                        <a href="/en/article/loki-kubernetes-logging/">Loki - Kubernetes logging</a>
+                    </li>
+                
+                    <li>
+                        <a href="/en/article/setup-a-production-ready-istio/">Setup a production-ready Istio</a>
+                    </li>
+                
+                    <li>
+                        <a href="/en/article/prometheus-alertmanager-with-msteams/">Alerts of the Prometheus Alertmanager with MS Teams</a>
+                    </li>
+                
+                </ul>
+        </div>
+        
+
+        
+        <div class="categories">
+            <a href="/en/categories/"><strong>Categories</strong></a>
+                <ul>
+                
+                    <li>
+                        <a href="/en/categories/kubernetes">Kubernetes (3)</a>
+                    </li>
+                
+                    <li>
+                        <a href="/en/categories/tutorials">Tutorials (3)</a>
+                    </li>
+                
+                    <li>
+                        <a href="/en/categories/devops">Devops (2)</a>
+                    </li>
+                
+                    <li>
+                        <a href="/en/categories/monitoring">Monitoring (2)</a>
+                    </li>
+                
+                    <li>
+                        <a href="/en/categories/prometheus">Prometheus (2)</a>
+                    </li>
+                
+                    <li>
+                        <a href="/en/categories/alertmanager">Alertmanager (1)</a>
+                    </li>
+                
+                    <li>
+                        <a href="/en/categories/exporter">Exporter (1)</a>
+                    </li>
+                
+                    <li>
+                        <a href="/en/categories/grafana">Grafana (1)</a>
+                    </li>
+                
+                    <li>
+                        <a href="/en/categories/istio">Istio (1)</a>
+                    </li>
+                
+                    <li>
+                        <a href="/en/categories/loki">Loki (1)</a>
+                    </li>
+                
+                    <li>
+                        <a href="/en/categories/service-mesh">Service mesh (1)</a>
+                    </li>
+                
+            </ul>
+        </div>
+        
+
+        <div class="right">
+            
+            <div class="external-profiles">
+                <strong>Social media</strong>
+
+                
+                
+                
+                
+                
+                
+                
+                
+                
+                
+                    <a href="https://github.com/lapee79" target="_blank"><i class="fa fa-github"></i></a>
+                
+                
+            </div>
+            
+
+            
+        </div>
+    </div>
+</footer>
+
+
+<div class="credits">
+    <div class="container">
+        <div class="copyright">
+            <a href="https://github.com/lapee79" target="_blank">
+                &copy;
+                
+                    2020
+                
+                by lapee79
+            </a>
+	    
+        </div>
+        <div class="author">
+            <a href="https://github.com/Lednerb/bilberry-hugo-theme" target="_blank">Bilberry Hugo Theme</a>
+        </div>
+    </div>
+</div>
+
+
+        
+<script type="application/javascript">
+var doNotTrack = false;
+if (!doNotTrack) {
+	window.ga=window.ga||function(){(ga.q=ga.q||[]).push(arguments)};ga.l=+new Date;
+	ga('create', 'UA-148360124-1', 'auto');
+	
+	ga('send', 'pageview');
+}
+</script>
+<script async src='https://www.google-analytics.com/analytics.js'></script>
+
+
+        
+
+        
+        
+        <script type="text/javascript" src="https://lapee79.github.io/js/externalDependencies.39c47e10e241eae2947b3fe21809c572.js" integrity="md5-OcR&#43;EOJB6uKUez/iGAnFcg=="></script>
+
+        
+        
+        <script type="text/javascript" src="https://lapee79.github.io/js/theme.ff50ae6dc1bfc220b23bf69dbb41b54e.js" integrity="md5-/1CubcG/wiCyO/adu0G1Tg=="></script>
+
+        <script>
+            $(".moment").each(function() {
+                $(this).text(
+                    moment( $(this).text() )
+                        .locale( "en" )
+                        .format('LL')
+                );
+            });
+
+            $(".footnote-return sup").html("");
+        </script>
+
+        
+            
+        
+
+        
+            <script>
+    var client = algoliasearch("1RS3EVEBZI", "287247fefbadb3e2e5e0960034440842");
+    var index = client.initIndex("lapee79-tech-blog");
+
+    $('#search').autocomplete({ hint: false, autoselect: true, debug: false },
+      [
+        {
+          
+            source: $.fn.autocomplete.sources.hits(index, { hitsPerPage: 10 }),
+          
+          displayKey: function(suggestion) {
+            return suggestion.title || suggestion.author
+          },
+          templates: {
+            suggestion: function(suggestion) {
+                return "<span class='entry " + suggestion.type + "'>"
+                      + "<span class='title'>" + suggestion.title + "</span>"
+                      + "<span class='fa fa-fw " + suggestion.iconClass + "'></span>"
+                  + "</span>"
+                ;
+            },
+            empty: function() {
+              return "<span class='empty'>Nothing found.</span>"
+            },
+            footer: function() {
+              return '<div class="branding">Powered by <img src="https:\/\/lapee79.github.io\/dist\/algolia-logo-light.svg" /></div>'
+            }
+
+          },
+        }
+      ])
+      .on('autocomplete:selected', function(event, suggestion, dataset) {
+        window.location = (suggestion.url);
+      })
+      .keypress(function (event, suggestion) {
+        if (event.which == 13) {
+          window.location = (suggestion.url);
+        }
+      });
+</script>
+
+        
+
+
+    </body>
+</html>

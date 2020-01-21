@@ -1,0 +1,617 @@
+<!doctype html>
+<html class="no-js" lang="ko">
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="author" content="lapee79">
+        <meta name="description" content="lapee79&#39;s IT Tech Blog.">
+        <meta name="keywords" content="blog,personal,posts,it,korean">
+        <meta name="generator" content="Hugo 0.53" />
+        <title> Kubernetes | lapee79&#39;s Tech Blog</title>
+        <meta name="description" content="Kubernetes - lapee79&#39;s IT Tech Blog.">
+        <meta itemprop="name" content="Kubernetes">
+        <meta itemprop="description" content="Kubernetes - lapee79&#39;s IT Tech Blog.">
+        <meta property="og:title" content="Kubernetes">
+        <meta property="og:description" content="Kubernetes - lapee79&#39;s IT Tech Blog.">
+        <meta property="og:image" content="https://www.gravatar.com/avatar/4068068eb59505ffebdc556d0aa2c9c9?size=200">
+        <meta property="og:url" content="https://lapee79.github.io/tags/kubernetes/">
+        <meta property="og:site_name" content="lapee79&#39;s Tech Blog"><meta property="og:type" content="website">
+        <link rel="icon" type="image/png" href="https://lapee79.github.io/favicon-32x32.png" sizes="32x32">
+        <link rel="icon" type="image/png" href="https://lapee79.github.io/favicon-16x16.png" sizes="16x16">
+
+	
+	  <link href="https://lapee79.github.io/tags/kubernetes/index.xml" rel="alternate" type="application/rss+xml" title="lapee79&#39;s Tech Blog" />
+	  <link href="https://lapee79.github.io/tags/kubernetes/index.xml" rel="feed" type="application/rss+xml" title="lapee79&#39;s Tech Blog" />
+	
+
+        
+        
+        
+        
+        <link rel="stylesheet" href="https://lapee79.github.io/sass/combined.min.c7b63af25d73ccc22a82ec5d3a6dfccaf77ecee67014e5cc71dd9d8eafec0d4e.css">
+
+        
+
+        
+            
+        
+    </head>
+    <body class="bilberry-hugo-theme">
+        
+<nav class="permanentTopNav">
+
+    <div class="container">
+        <ul class="topnav">
+            
+        </ul>
+
+        
+            <div id="search-box" class="search">
+                <i class="fa fa-search"></i>
+                <input id="search" type="text" placeholder="검색 ...">
+            </div>
+        
+    </div>
+</nav>
+
+
+        <header>
+    <div class="container">
+        <div class="logo">
+            <a href="/" class="logo">
+                
+                    <img src="https://www.gravatar.com/avatar/4068068eb59505ffebdc556d0aa2c9c9?d=mm&size=200" alt="">
+                
+
+                <span class="overlay"><i class="fa fa-home"></i></span>
+            </a>
+        </div>
+        <div class="titles">
+            <h3 class="title"><a href="/">lapee79&#39;s Tech Blog</a></h3>
+            
+                <span class="subtitle">lapee79의 기술 지식 창고.</span>
+            
+        </div>
+
+    
+
+        
+        <div class="toggler permanentTopNav">
+        
+            <i class="fa fa-bars" aria-hidden="true"></i>
+        </div>
+    </div>
+    <script data-ad-client="ca-pub-6723773787660575" async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
+</header>
+
+
+        <div class="main container">
+            
+    
+    
+        <div class="article-wrapper u-cf">
+            
+                <a class="bubble" href="/article/use-a-local-disk-by-local-volume-static-provisioner-in-kubernetes/">
+    <i class="fa fa-fw fa-pencil"></i>
+</a>
+
+<article class="default article">
+    
+    <div class="featured-image">
+        <a href="/article/use-a-local-disk-by-local-volume-static-provisioner-in-kubernetes/">
+            
+                <img src="/article/use-a-local-disk-by-local-volume-static-provisioner-in-kubernetes/featuredImage_hu550e3e90bdcd72c204e7dc9fd34e1ffc_77274_700x350_fill_q95_box_smart1.jpg" alt="">
+            
+        </a>
+    </div>
+
+
+    <div class="content">
+    <h3><a href="/article/use-a-local-disk-by-local-volume-static-provisioner-in-kubernetes/">Kubernetes에서 Local Persistent Volume을 사용하여 local disk 사용</a></h3>
+    <div class="meta">
+        
+            
+                <span class="date moment">2020-01-19</span>
+            
+        
+
+        
+
+        
+            <span class="categories">
+                
+                    <a href="/categories/kubernetes">Kubernetes</a>
+                
+                    <a href="/categories/devops">DevOps</a>
+                
+            </span>
+        
+
+        
+            <span class="author"><a href="/author/lapee79">lapee79</a></span>
+        
+    </div>
+
+    
+        Local Persistent Volume 기능은 Kubernetes 1.14에서 GA 되었습니다. Local Persistent Volume은 한 Kubernetes Node에 직접적으로 장착된 local disk를 가리킵니다.
+Kubernetes에서 HostPath, LocalVolume 을 통해 local disk를 사용할 수 있습니다.
+ HostPath: 스케쥴링 정보를 가지지 않은 볼륨. 각각의 pod를 한 node에 고정하려고 한다면 pod 정의에 nodeSelector같은 스케쥴링 정보를 설정해야 합니다. LocalVolume: 볼륨 자체적으로 스케쥴링 정보를 가지며, 이 볼륨을 사용하는 pod는 특정 node에 고정할 수 있으므로 데이터 연속성을 보장할 수 있습니다.  Local Persistent Volumes 는 표준 PVC 객체를 사용한 local disk에 엑세스를 허용합니다.
+
+        
+            <a href="/article/use-a-local-disk-by-local-volume-static-provisioner-in-kubernetes/" class="more">더보기</a>
+        
+    
+</div>
+
+    
+<div class="footer">
+
+
+    
+        <div class="tags">
+            <i class="fa fa-tags"></i>
+            <div class="links">
+                
+                    <a href="/tags/kubernetes">Kubernetes</a>
+                
+                    <a href="/tags/local-persistent-volumes">Local Persistent Volumes</a>
+                
+            </div>
+        </div>
+    
+
+    
+    <div class="languages">
+        <i class="fa fa-language"></i>
+        <div class="links">
+            
+                <a href="https://lapee79.github.io/en/article/use-a-local-disk-by-local-volume-static-provisioner-in-kubernetes/">en</a>
+            
+        </div>
+    </div>
+    
+</div>
+
+</article>
+
+            
+        </div>
+    
+        <div class="article-wrapper u-cf">
+            
+                <a class="bubble" href="/article/setup-production-ready-kubernetes-on-baremetal-with-kubespray/">
+    <i class="fa fa-fw fa-pencil"></i>
+</a>
+
+<article class="default article">
+    
+    <div class="featured-image">
+        <a href="/article/setup-production-ready-kubernetes-on-baremetal-with-kubespray/">
+            
+                <img src="/article/setup-production-ready-kubernetes-on-baremetal-with-kubespray/featuredImage_hu3bced1e920add2777bea4e2136b2d62b_53357_700x350_fill_q95_box_smart1_2.png" alt="">
+            
+        </a>
+    </div>
+
+
+    <div class="content">
+    <h3><a href="/article/setup-production-ready-kubernetes-on-baremetal-with-kubespray/">Bare Metal 서버에 kubespray를 이용하여 Production 환경의 Kubernetes 클러스터 구축</a></h3>
+    <div class="meta">
+        
+            
+                <span class="date moment">2019-12-23</span>
+            
+        
+
+        
+
+        
+            <span class="categories">
+                
+                    <a href="/categories/kubernetes">Kubernetes</a>
+                
+                    <a href="/categories/devops">DevOps</a>
+                
+            </span>
+        
+
+        
+            <span class="author"><a href="/author/lapee79">lapee79</a></span>
+        
+    </div>
+
+    
+        Kubespray는 일반적인 OS 설정과 Kubernetes 구성/관리 작업에 관련된 Ansible playbook들과 inventory 그리고 배포 도구들을 조합한 소프트웨어입니다.
+구성환경 하드웨어  5 Nodes: VM 또는 물리 서버 Memory: 8GB
+ CPU: 4Core
+ 디스크: 120GB 이상
+  소프트웨어 Kubernetes nodes
+ Ubuntu 18.04 Python SSH Server sudo 권한을 가진 유저  Kubespray machine
+ Ansible 2.7.8+(not 2.8.x) Jinja 2.9+  Node 네트워킹 요구사항  Docker 이미지들을 download하고 소프트웨어들을 설치할 수 있도록 인터넷 접속을 허용해줍니다.
+
+        
+            <a href="/article/setup-production-ready-kubernetes-on-baremetal-with-kubespray/" class="more">더보기</a>
+        
+    
+</div>
+
+    
+<div class="footer">
+
+
+    
+        <div class="tags">
+            <i class="fa fa-tags"></i>
+            <div class="links">
+                
+                    <a href="/tags/kubernetes">Kubernetes</a>
+                
+                    <a href="/tags/baremetal">Baremetal</a>
+                
+                    <a href="/tags/kubespray">kubespray</a>
+                
+                    <a href="/tags/production">Production</a>
+                
+            </div>
+        </div>
+    
+
+    
+    <div class="languages">
+        <i class="fa fa-language"></i>
+        <div class="links">
+            
+                <a href="https://lapee79.github.io/en/article/setup-production-ready-kubernetes-on-baremetal-with-kubespray/">en</a>
+            
+        </div>
+    </div>
+    
+</div>
+
+</article>
+
+            
+        </div>
+    
+        <div class="article-wrapper u-cf">
+            
+                <a class="bubble" href="/article/loki-kubernetes-logging/">
+    <i class="fa fa-fw fa-pencil"></i>
+</a>
+
+<article class="default article">
+    
+    <div class="featured-image">
+        <a href="/article/loki-kubernetes-logging/">
+            
+                <img src="/article/loki-kubernetes-logging/featuredImage_hu32ea944e146594c1b0cba1925deb2048_29654_700x350_fill_q95_box_smart1.jpg" alt="">
+            
+        </a>
+    </div>
+
+
+    <div class="content">
+    <h3><a href="/article/loki-kubernetes-logging/">Loki - Kubernetes 로깅</a></h3>
+    <div class="meta">
+        
+            
+                <span class="date moment">2019-09-23</span>
+            
+        
+
+        
+
+        
+            <span class="categories">
+                
+                    <a href="/categories/loki">Loki</a>
+                
+                    <a href="/categories/grafana">Grafana</a>
+                
+                    <a href="/categories/kubernetes">Kubernetes</a>
+                
+                    <a href="/categories/tutorials">Tutorials</a>
+                
+            </span>
+        
+
+        
+            <span class="author"><a href="/author/lapee79">lapee79</a></span>
+        
+    </div>
+
+    
+        Loki는 Prometheus에 영감을 받아서 탄생한 클라우드 네이티브 인프라를 위한 로깅 서비스입니다.
+Loki는 무엇인가? KubeCon Seattle 2018에서 Grafana Labs에서 오픈소스로 공개된 Loki는 Kubernetes에서 Prometheus에 대한 경험이 있는 사용자에게 최적화된 로깅 백엔드입니다. Loki는 뛰어난 로그 검색 및 시각화 기능을 Grafana 6.0에서 제공합니다.
+Grafana Loki는 완전한 기능을 갖춘 로깅 스택으로 구성되어져 있습니다.
+Loki는 단일 로그 라인을 그대로 처리한다는 아이디어를 기반으로 만들어졌습니다. 이는 전체 텍스트 인덱싱을 하는 것이 아니라 Prometheus와 마찬가지로 동일한 label을 사용하여 관련 로그들을 그룹화한다는 것을 의미합니다.
+
+        
+            <a href="/article/loki-kubernetes-logging/" class="more">더보기</a>
+        
+    
+</div>
+
+    
+<div class="footer">
+
+
+    
+        <div class="tags">
+            <i class="fa fa-tags"></i>
+            <div class="links">
+                
+                    <a href="/tags/loki">Loki</a>
+                
+                    <a href="/tags/grafana">Grafana</a>
+                
+                    <a href="/tags/kubernetes">Kubernetes</a>
+                
+                    <a href="/tags/tutorials">Tutorials</a>
+                
+                    <a href="/tags/logging">logging</a>
+                
+            </div>
+        </div>
+    
+
+    
+    <div class="languages">
+        <i class="fa fa-language"></i>
+        <div class="links">
+            
+                <a href="https://lapee79.github.io/en/article/loki-kubernetes-logging/">en</a>
+            
+        </div>
+    </div>
+    
+</div>
+
+</article>
+
+            
+        </div>
+    
+
+    
+    <div class="paginator">
+        
+
+        
+    </div>
+
+
+
+        </div>
+
+        
+<footer>
+    <div class="container">
+
+        
+        <div class="recent-posts">
+            <strong>최근 글</strong>
+                <ul>
+                
+                    <li>
+                        <a href="/article/use-a-local-disk-by-local-volume-static-provisioner-in-kubernetes/">Kubernetes에서 Local Persistent Volume을 사용하여 local disk 사용</a>
+                    </li>
+                
+                    <li>
+                        <a href="/article/setup-production-ready-kubernetes-on-baremetal-with-kubespray/">Bare Metal 서버에 kubespray를 이용하여 Production 환경의 Kubernetes 클러스터 구축</a>
+                    </li>
+                
+                    <li>
+                        <a href="/article/monitoring-http-using-blackbox-exporter/">Blackbox exporter를 이용한 HTTP 모니터링</a>
+                    </li>
+                
+                    <li>
+                        <a href="/article/loki-kubernetes-logging/">Loki - Kubernetes 로깅</a>
+                    </li>
+                
+                    <li>
+                        <a href="/article/setup-a-production-ready-istio/">Setup a production-ready Istio</a>
+                    </li>
+                
+                    <li>
+                        <a href="/article/prometheus-alertmanager-with-msteams/">Alertmanager로 Prometheus의 알람을 Microsoft Teams에 발송하기</a>
+                    </li>
+                
+                    <li>
+                        <a href="/article/hosting-website-from-githubpages/">GitHub Pages에서 웹사이트 호스팅하기</a>
+                    </li>
+                
+                </ul>
+        </div>
+        
+
+        
+        <div class="categories">
+            <a href="/categories/"><strong>카테고리</strong></a>
+                <ul>
+                
+                    <li>
+                        <a href="/categories/tutorials">Tutorials (4)</a>
+                    </li>
+                
+                    <li>
+                        <a href="/categories/kubernetes">Kubernetes (3)</a>
+                    </li>
+                
+                    <li>
+                        <a href="/categories/devops">Devops (2)</a>
+                    </li>
+                
+                    <li>
+                        <a href="/categories/monitoring">Monitoring (2)</a>
+                    </li>
+                
+                    <li>
+                        <a href="/categories/prometheus">Prometheus (2)</a>
+                    </li>
+                
+                    <li>
+                        <a href="/categories/alertmanager">Alertmanager (1)</a>
+                    </li>
+                
+                    <li>
+                        <a href="/categories/exporter">Exporter (1)</a>
+                    </li>
+                
+                    <li>
+                        <a href="/categories/github-pages">Github pages (1)</a>
+                    </li>
+                
+                    <li>
+                        <a href="/categories/grafana">Grafana (1)</a>
+                    </li>
+                
+                    <li>
+                        <a href="/categories/istio">Istio (1)</a>
+                    </li>
+                
+                    <li>
+                        <a href="/categories/loki">Loki (1)</a>
+                    </li>
+                
+                    <li>
+                        <a href="/categories/service-mesh">Service mesh (1)</a>
+                    </li>
+                
+            </ul>
+        </div>
+        
+
+        <div class="right">
+            
+            <div class="external-profiles">
+                <strong>소셜 미디어</strong>
+
+                
+                
+                
+                
+                
+                
+                
+                
+                
+                
+                    <a href="https://github.com/lapee79" target="_blank"><i class="fa fa-github"></i></a>
+                
+                
+            </div>
+            
+
+            
+        </div>
+    </div>
+</footer>
+
+
+<div class="credits">
+    <div class="container">
+        <div class="copyright">
+            <a href="https://github.com/lapee79" target="_blank">
+                &copy;
+                
+                    2020
+                
+                by lapee79
+            </a>
+	    -
+		<a href="https://lapee79.github.io/tags/kubernetes/index.xml">RSS</a>
+        </div>
+        <div class="author">
+            <a href="https://github.com/Lednerb/bilberry-hugo-theme" target="_blank">Bilberry Hugo Theme</a>
+        </div>
+    </div>
+</div>
+
+
+        
+<script type="application/javascript">
+var doNotTrack = false;
+if (!doNotTrack) {
+	window.ga=window.ga||function(){(ga.q=ga.q||[]).push(arguments)};ga.l=+new Date;
+	ga('create', 'UA-148360124-1', 'auto');
+	
+	ga('send', 'pageview');
+}
+</script>
+<script async src='https://www.google-analytics.com/analytics.js'></script>
+
+
+        
+
+        
+        
+        <script type="text/javascript" src="https://lapee79.github.io/js/externalDependencies.39c47e10e241eae2947b3fe21809c572.js" integrity="md5-OcR&#43;EOJB6uKUez/iGAnFcg=="></script>
+
+        
+        
+        <script type="text/javascript" src="https://lapee79.github.io/js/theme.ff50ae6dc1bfc220b23bf69dbb41b54e.js" integrity="md5-/1CubcG/wiCyO/adu0G1Tg=="></script>
+
+        <script>
+            $(".moment").each(function() {
+                $(this).text(
+                    moment( $(this).text() )
+                        .locale( "ko" )
+                        .format('LL')
+                );
+            });
+
+            $(".footnote-return sup").html("");
+        </script>
+
+        
+            
+        
+
+        
+            <script>
+    var client = algoliasearch("1RS3EVEBZI", "287247fefbadb3e2e5e0960034440842");
+    var index = client.initIndex("lapee79-tech-blog");
+
+    $('#search').autocomplete({ hint: false, autoselect: true, debug: false },
+      [
+        {
+          
+            source: $.fn.autocomplete.sources.hits(index, { hitsPerPage: 10 }),
+          
+          displayKey: function(suggestion) {
+            return suggestion.title || suggestion.author
+          },
+          templates: {
+            suggestion: function(suggestion) {
+                return "<span class='entry " + suggestion.type + "'>"
+                      + "<span class='title'>" + suggestion.title + "</span>"
+                      + "<span class='fa fa-fw " + suggestion.iconClass + "'></span>"
+                  + "</span>"
+                ;
+            },
+            empty: function() {
+              return "<span class='empty'>검색 결과가 없습니다.</span>"
+            },
+            footer: function() {
+              return '<div class="branding">Powered by <img src="https:\/\/lapee79.github.io\/dist\/algolia-logo-light.svg" /></div>'
+            }
+
+          },
+        }
+      ])
+      .on('autocomplete:selected', function(event, suggestion, dataset) {
+        window.location = (suggestion.url);
+      })
+      .keypress(function (event, suggestion) {
+        if (event.which == 13) {
+          window.location = (suggestion.url);
+        }
+      });
+</script>
+
+        
+
+
+    </body>
+</html>

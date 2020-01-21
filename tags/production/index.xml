@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Production on lapee79&#39;s Tech Blog</title>
+    <link>https://lapee79.github.io/tags/production/</link>
+    <description>Recent content in Production on lapee79&#39;s Tech Blog</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <lastBuildDate>Mon, 23 Dec 2019 10:00:00 +0000</lastBuildDate>
+    
+	<atom:link href="https://lapee79.github.io/tags/production/index.xml" rel="self" type="application/rss+xml" />
+    
+    
+    <item>
+      <title>Bare Metal 서버에 kubespray를 이용하여 Production 환경의 Kubernetes 클러스터 구축</title>
+      <link>https://lapee79.github.io/article/setup-production-ready-kubernetes-on-baremetal-with-kubespray/</link>
+      <pubDate>Mon, 23 Dec 2019 10:00:00 +0000</pubDate>
+      
+      <guid>https://lapee79.github.io/article/setup-production-ready-kubernetes-on-baremetal-with-kubespray/</guid>
+      <description>Kubespray는 일반적인 OS 설정과 Kubernetes 구성/관리 작업에 관련된 Ansible playbook들과 inventory 그리고 배포 도구들을 조합한 소프트웨어입니다.
+구성환경 하드웨어  5 Nodes: VM 또는 물리 서버 Memory: 8GB
+ CPU: 4Core
+ 디스크: 120GB 이상
+  소프트웨어 Kubernetes nodes
+ Ubuntu 18.04 Python SSH Server sudo 권한을 가진 유저  Kubespray machine
+ Ansible 2.7.8+(not 2.8.x) Jinja 2.9+  Node 네트워킹 요구사항  Docker 이미지들을 download하고 소프트웨어들을 설치할 수 있도록 인터넷 접속을 허용해줍니다.</description>
+    </item>
+    
+  </channel>
+</rss>

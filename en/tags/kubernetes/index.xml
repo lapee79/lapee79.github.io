@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Kubernetes on lapee79&#39;s Tech Blog</title>
+    <link>https://lapee79.github.io/en/tags/kubernetes/</link>
+    <description>Recent content in Kubernetes on lapee79&#39;s Tech Blog</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <lastBuildDate>Sun, 19 Jan 2020 10:00:00 +0000</lastBuildDate>
+    
+	<atom:link href="https://lapee79.github.io/en/tags/kubernetes/index.xml" rel="self" type="application/rss+xml" />
+    
+    
+    <item>
+      <title>Use a local disk through Local Persistent Volumes in Kubernetes</title>
+      <link>https://lapee79.github.io/en/article/use-a-local-disk-by-local-volume-static-provisioner-in-kubernetes/</link>
+      <pubDate>Sun, 19 Jan 2020 10:00:00 +0000</pubDate>
+      
+      <guid>https://lapee79.github.io/en/article/use-a-local-disk-by-local-volume-static-provisioner-in-kubernetes/</guid>
+      <description>The Local Persistent Volumes feature has been promoted to GA in Kubernetes 1.14. A local persistent volume represents a local disk directly-attached to a single Kubernetes Node.
+In the Kubernetes system, local disks can be used through HostPath, LocalVolume.
+ HostPath: The volume itself does not contain scheduling information. If you want to fix each pod on a node, you need to configure scheduling information, such as nodeSelector, for the pod.</description>
+    </item>
+    
+    <item>
+      <title>Setup Production Ready Kubernetes on baremetal with kubespray</title>
+      <link>https://lapee79.github.io/en/article/setup-production-ready-kubernetes-on-baremetal-with-kubespray/</link>
+      <pubDate>Mon, 23 Dec 2019 10:00:00 +0000</pubDate>
+      
+      <guid>https://lapee79.github.io/en/article/setup-production-ready-kubernetes-on-baremetal-with-kubespray/</guid>
+      <description>Kubespray is a composition of Ansible playbooks, inventory, provisioning tools, and domain knowledge for generic OS/Kubernetes clusters configuration management tasks.
+Prerequisites Hardware  5 Nodes: Virtual/Physical Machines Memory: 8GB
+ CPU: 4Core
+ Hard disk: 120GB available
+  Software Kubernetes nodes
+ Ubuntu 18.04 Python SSH Server Privileged user  Kubespray machine
+ Ansible 2.7.8+(not 2.8.x) Jinja 2.9+  Nodes Networking requisites  Internet access to download docker images and install softwares IPv4 Forwarding should be enabled In order to avoid any issue during deployment, you should disable firewall.</description>
+    </item>
+    
+    <item>
+      <title>Loki - Kubernetes logging</title>
+      <link>https://lapee79.github.io/en/article/loki-kubernetes-logging/</link>
+      <pubDate>Mon, 23 Sep 2019 10:00:00 +0000</pubDate>
+      
+      <guid>https://lapee79.github.io/en/article/loki-kubernetes-logging/</guid>
+      <description>Loki is a Prometheus-inspired logging service for cloud native infrastructure.
+What is Loki? Open sourced by Grafana Labs during KubeCon Seattle 2018, Loki is a logging backend optimized for users running Prometheus and Kubernetes with great logs search and visualization in Grafana 6.0.
+Grafana Loki is a set of components, that can be composed into a fully featured logging stack.
+It builds around the idea of treating a single log line as-is.</description>
+    </item>
+    
+  </channel>
+</rss>

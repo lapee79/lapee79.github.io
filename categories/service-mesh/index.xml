@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Service Mesh on lapee79&#39;s Tech Blog</title>
+    <link>https://lapee79.github.io/categories/service-mesh/</link>
+    <description>Recent content in Service Mesh on lapee79&#39;s Tech Blog</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <lastBuildDate>Tue, 17 Sep 2019 10:00:00 +0000</lastBuildDate>
+    
+	<atom:link href="https://lapee79.github.io/categories/service-mesh/index.xml" rel="self" type="application/rss+xml" />
+    
+    
+    <item>
+      <title>Setup a production-ready Istio</title>
+      <link>https://lapee79.github.io/article/setup-a-production-ready-istio/</link>
+      <pubDate>Tue, 17 Sep 2019 10:00:00 +0000</pubDate>
+      
+      <guid>https://lapee79.github.io/article/setup-a-production-ready-istio/</guid>
+      <description>Istio는 service mesh 기술로 네트워크에 추상화 계층을 추가하여 마이크로 서비스의 연결, 관리, 보안 기능들을 제공합니다. 이 포스트에서는 Istio를 Kubernetes 플랫폼 상에 Production 환경에 맞게 설치하는 방식에 대해서 알아보겠습니다.
+Istio는 다양한 기본 Configuration Profile을 제공합니다. 하지만 Production에서 Istio를 구성하기 위해서는 기본 Configuration Profile에서 다음 사항들을 적용하여 설치가 필요합니다.
+ 기본 설정에서 최적화된 설정값을 적용하여 성능을 개선 Secure Gateway를 위한 SDS 활성화 Prometheus, Grafana, Jaeger, Kiali 와 같은 구성요소들을 별도로 구성하여 통합  위 사항들이 반영될 수 있도록 Istio 설치 절차를 살펴보도록 하겠습니다.</description>
+    </item>
+    
+  </channel>
+</rss>

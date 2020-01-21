@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Github Pages on lapee79&#39;s Tech Blog</title>
+    <link>https://lapee79.github.io/tags/github-pages/</link>
+    <description>Recent content in Github Pages on lapee79&#39;s Tech Blog</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <lastBuildDate>Wed, 16 Jan 2019 04:10:00 +0000</lastBuildDate>
+    
+	<atom:link href="https://lapee79.github.io/tags/github-pages/index.xml" rel="self" type="application/rss+xml" />
+    
+    
+    <item>
+      <title>GitHub Pages에서 웹사이트 호스팅하기</title>
+      <link>https://lapee79.github.io/article/hosting-website-from-githubpages/</link>
+      <pubDate>Wed, 16 Jan 2019 04:10:00 +0000</pubDate>
+      
+      <guid>https://lapee79.github.io/article/hosting-website-from-githubpages/</guid>
+      <description>요즘 웹사이트를 개설하는 것은 놀라운 일은 아닙니다. 웹사이트는 기업 홈페이지, 개인 블로그, 포트폴리오, 온라인 쇼핑몰 등으로 다양합니다. 이런 서비스들은 다양하게 있지만 일반적으로 비용을 요구합니다.
+하지만 GitHub Pages를 이용한다면 무료로 웹사이트를 호스팅할 수 있습니다. GitHub는 소프트웨어 개발자들에게 협업할 수 있는 git repository를 제공하는 서비스로 세상에서 가장 큰 개발자 커뮤니티이기도 합니다. 대부분의 Open Source project들이 GitHub을 통해 진행되기도 합니다. 이런 GitHub에서는 Pages라는 서비스로 무료로 정적 웹호스팅도 제공하고 있습니다.
+5분만에 웹사이트를 개설해보자. 이제 실제로 GitHub Pages 웹사이트를 개설해보겠습니다.</description>
+    </item>
+    
+  </channel>
+</rss>
